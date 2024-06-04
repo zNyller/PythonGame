@@ -1,6 +1,5 @@
 import pygame
 from components.attack_component import AttackComponent
-from entities.mob import Mob
 
 class BasicAttackComponent(AttackComponent):
     """
@@ -75,8 +74,12 @@ class BasicAttackComponent(AttackComponent):
             'damage': self.attack_damage
         })
 
-        if isinstance(target, Mob):
-            target.rect.centerx -= 30
+        # Calcula a direção do recuo com base nas posições do atacante e do alvo
+        direction_x = target.rect.centerx - self.entity.rect.centerx
+        if direction_x != 0:
+            direction_x /= abs(direction_x) # Normaliza para obter -1 ou 1
+        recuo_distancia = 30
+        target.rect.centerx += direction_x * recuo_distancia
 
         if target.life <= 0: # Usando a propriedade de vida encapsulada
             target.death_sound.play()

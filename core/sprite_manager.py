@@ -32,8 +32,6 @@ class SpriteManager:
     def update_all(self):
         """Atualiza os sprites na tela."""
 
-
-
         self.player_sprites.update(self.mob_sprites)
         self.mob_sprites.update(self.player_sprites)
 

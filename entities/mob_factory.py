@@ -20,7 +20,8 @@ class MobFactory:
 
         # Carrega imagens e sons do ResourceManager
         images = {
-            'default': self.resource_manager.get_image('mob')
+            'default': self.resource_manager.get_image('mob'),
+            'attacking': self.resource_manager.get_image('mob_attacking') 
         }
         sounds = {
             'blood_pop': self.resource_manager.get_sound('blood_pop'),

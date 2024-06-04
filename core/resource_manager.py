@@ -17,6 +17,7 @@ class ResourceManager:
             self.images['player'] = pygame.image.load(f'{IMAGES_DIR}/guts.png').convert_alpha()
             self.images['player_attacking'] = pygame.image.load(f'{IMAGES_DIR}/guts_attack.png').convert_alpha()
             self.images['mob'] = pygame.image.load(f'{IMAGES_DIR}/mob.png').convert_alpha()
+            self.images['mob_attacking'] = pygame.image.load(f'{IMAGES_DIR}/mob_attack.png').convert_alpha()
             self.images['camping'] = pygame.image.load(f'{IMAGES_DIR}/camping.jpg')
 
             self.sounds['attack_sound'] = pygame.mixer.Sound(f'{SOUNDS_DIR}/attack_sound.wav')

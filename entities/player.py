@@ -55,6 +55,7 @@ class Player(pygame.sprite.Sprite):
         self.attack_duration = self.ATTACK_DURATION
         self.attack_cooldown = self.ATTACK_COOLDOWN
         self.attack_sound = sounds["attacking"]
+        self.receive_damage_sound = sounds["hit"]
         self.attack_component = BasicAttackComponent(self, self.attack_damage, self.attack_duration, self.attack_sound, self.attack_cooldown, self.event_manager)
         
         # Movimento

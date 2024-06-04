@@ -1,6 +1,7 @@
 import pygame
 from config.constants import LEFT_BOUNDARY, RIGHT_BOUNDARY, RED
 from components.life_bar_component import LifeBarComponent
+from components.basic_attack_component import BasicAttackComponent
 
 class Mob(pygame.sprite.Sprite):
     """
@@ -17,7 +18,7 @@ class Mob(pygame.sprite.Sprite):
     """
 
     MAX_LIFE = 50
-    STRENGTH = 2
+    STRENGTH = 3
     INITIAL_POSITION = (150, 320)
     MOVE_SPEED = 0.5
 
@@ -33,7 +34,9 @@ class Mob(pygame.sprite.Sprite):
         self.speed = self.MOVE_SPEED
 
         # Imagem e posição
-        self.image = images["default"]
+        self.default_image = images["default"]
+        self.attacking_image = images["attacking"]
+        self.image = self.default_image
         self.rect = self.image.get_rect(center = self.INITIAL_POSITION) 
         self.mask = pygame.mask.from_surface(self.image)
 
@@ -41,6 +44,7 @@ class Mob(pygame.sprite.Sprite):
         # Barra de vida
         self.life_bar_component = LifeBarComponent(self, event_manager, width=40, height=8, color=RED)
         # Atributos de combate
+        self.attack_component = BasicAttackComponent(self, self.strength, 25, sounds["hit_player"], 30, self.event_manager)
         self.receive_damage_sound = sounds["scream"]
         self.death_sound = sounds["blood_pop"]
 
@@ -59,9 +63,13 @@ class Mob(pygame.sprite.Sprite):
         """Atualiza a barra de vida e verifica colisão com o player para mover."""
 
         self.life_bar_component.update_life_bar()
+        self.attack_component.update(player_sprites)
+
         hit_player = pygame.sprite.spritecollideany(self, player_sprites, pygame.sprite.collide_mask)
         if not hit_player:
             self.move()
+        elif self.attack_component.state == 'idle':
+            self.attack_component.attack()
 
 
     def draw_life_bar(self, screen):

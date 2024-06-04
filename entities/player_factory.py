@@ -21,7 +21,8 @@ class PlayerFactory:
         sounds = {
             'attacking': self.resource_manager.get_sound('attack_sound'),
             'level_complete': self.resource_manager.get_sound('level_complete'),
-            'jumping': self.resource_manager.get_sound('player_jump')
+            'jumping': self.resource_manager.get_sound('player_jump'),
+            'hit': self.resource_manager.get_sound('hit_player')
         }
 
         player = Player(name, images, sounds, self.event_manager)
