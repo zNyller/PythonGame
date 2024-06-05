@@ -16,7 +16,10 @@ class PlayerFactory:
 
         images = {
             'default': self.resource_manager.get_image('player'),
-            'attacking': self.resource_manager.get_image('player_attacking')
+            'attacking': self.resource_manager.get_image('player_attacking'),
+            'stats_interface': self.resource_manager.get_image('stats_interface'),
+            'life_bar': self.resource_manager.get_image('life_bar'),
+            'xp_bar': self.resource_manager.get_image('xp_bar')
         }
         sounds = {
             'attacking': self.resource_manager.get_sound('attack_sound'),

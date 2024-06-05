@@ -1,10 +1,10 @@
 # Dimensões da janela
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 1024
+SCREEN_HEIGHT = 768
 
 # Limite de movimentos
-LEFT_BOUNDARY = 80
-RIGHT_BOUNDARY = 720
+LEFT_BOUNDARY = 100
+RIGHT_BOUNDARY = 900
 
 # Diretórios de recursos
 IMAGES_DIR = 'resources/images'

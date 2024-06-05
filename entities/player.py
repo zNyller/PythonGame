@@ -3,6 +3,8 @@ from config.constants import LEFT_BOUNDARY, RIGHT_BOUNDARY, GREEN
 from components.basic_attack_component import BasicAttackComponent
 from components.basic_movement_component import BasicMovementComponent
 from components.life_bar_component import LifeBarComponent
+from components.stats_bar_component import StatsBarComponent
+from entities.level_manager import LevelManager
 
 class Player(pygame.sprite.Sprite):
     """
@@ -18,11 +20,13 @@ class Player(pygame.sprite.Sprite):
     # Constants
     MAX_LIFE = 100
     INITIAL_STRENGTH = 1
-    INITIAL_POSITION = (380, 363)
+    INITIAL_POSITION = (600, 478)
     MOVE_SPEED = 4
     SWORD_DAMAGE = 10
     ATTACK_DURATION = 20
     ATTACK_COOLDOWN = 21
+    ATTACK_RANGE = 70
+    INITIAL_XP = 100
 
 
     def __init__(self, name, images, sounds, event_manager):
@@ -40,6 +44,8 @@ class Player(pygame.sprite.Sprite):
         self.strength = self.INITIAL_STRENGTH
         self.speed = self.MOVE_SPEED
 
+        self.xp = self.INITIAL_XP
+
         # Imagem e posição
         self.default_image = images['default']
         self.attacking_image = images['attacking']
@@ -49,17 +55,22 @@ class Player(pygame.sprite.Sprite):
 
         # Barra de vida
         self.life_bar_component = LifeBarComponent(self, event_manager, width=40, height=8, color=GREEN)
+        self.stats_bar_component = StatsBarComponent(self, images['stats_interface'], images['life_bar'], images['xp_bar'])
 
         # Atributos de combate
         self.attack_damage = self.SWORD_DAMAGE + self.strength
         self.attack_duration = self.ATTACK_DURATION
         self.attack_cooldown = self.ATTACK_COOLDOWN
+        self.attack_range = self.ATTACK_RANGE
         self.attack_sound = sounds["attacking"]
         self.receive_damage_sound = sounds["hit"]
-        self.attack_component = BasicAttackComponent(self, self.attack_damage, self.attack_duration, self.attack_sound, self.attack_cooldown, self.event_manager)
+        self.attack_component = BasicAttackComponent(self, self.attack_damage, self.attack_duration, self.attack_range, self.attack_sound, self.attack_cooldown, self.event_manager)
         
         # Movimento
         self.movement_component = BasicMovementComponent(self.rect, self.speed)
+
+        self.level_manager = LevelManager(self)
+        self.event_manager.subscribe('mob_defeated', self)
 
 
     def update(self, mobs_sprites):
@@ -76,6 +87,7 @@ class Player(pygame.sprite.Sprite):
         """Desenha a barra de vida do jogador."""
 
         self.life_bar_component.draw_life_bar(screen)
+        self.stats_bar_component.draw_stats_bar(screen)
         
 
     def handle_events(self):
@@ -84,14 +96,6 @@ class Player(pygame.sprite.Sprite):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
             self.attack_component.attack()
-
-
-    def reset(self):
-        """Reseta a posição e vida do jogador."""
-
-        self.rect.center = self.INITIAL_POSITION
-        self._life = self.MAX_LIFE
-
 
     # Encapsulando o acesso à life (@property é usado para definir o método 'life' como uma propriedade da classe Player.)
     @property
@@ -111,3 +115,25 @@ class Player(pygame.sprite.Sprite):
     def reduce_life(self, damage):
         """Método para reduzir a vida."""
         self.life -= damage
+
+
+    def reset(self):
+        """Reseta a posição e vida do jogador."""
+
+        self.rect.center = self.INITIAL_POSITION
+        self._life = self.MAX_LIFE
+
+
+    def on_mob_defeated(self):
+        self.level_manager.add_experience(10)
+        print(f"+10XP! Total: {self.level_manager.xp}")
+
+
+    def notify(self, event):
+        if event['type'] == 'mob_defeated':
+            self.on_mob_defeated()
+
+
+    def upgrade_stats(self, attack_range, strength):
+        self.attack_range += attack_range
+        self.strength += strength

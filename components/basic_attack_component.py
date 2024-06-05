@@ -9,10 +9,11 @@ class BasicAttackComponent(AttackComponent):
     a aplicação de dano aos alvos atingidos e a reprodução de sons de ataque.
     """
 
-    def __init__(self, entity, damage, attack_duration, attack_sound, attack_cooldown, event_manager):
+    def __init__(self, entity, damage, attack_duration, attack_range, attack_sound, attack_cooldown, event_manager):
         self.entity = entity
         self.attack_damage = damage
         self.initial_attack_duration = self.attack_duration = attack_duration
+        self.attack_range = attack_range
         self.attack_sound = attack_sound
         self.initial_attack_cooldown = self.attack_cooldown = attack_cooldown
         self.state = 'idle'
@@ -55,10 +56,11 @@ class BasicAttackComponent(AttackComponent):
     def perform_attack(self, target_sprites):
         """Realiza o ataque e verifica colisões com os alvos."""
 
-        hit_target = pygame.sprite.spritecollideany(self.entity, target_sprites, pygame.sprite.collide_mask)
-        if hit_target and hit_target not in self.hit_targets:
-            self.inflict_damage(hit_target)
-            self.hit_targets.add(hit_target)
+        for target in target_sprites:
+            distance = int(pygame.math.Vector2(target.rect.center).distance_to(self.entity.rect.center))
+            if distance <= self.attack_range and target not in self.hit_targets:
+                self.inflict_damage(target)
+                self.hit_targets.add(target)
 
 
     def inflict_damage(self, target):
@@ -84,6 +86,11 @@ class BasicAttackComponent(AttackComponent):
         if target.life <= 0: # Usando a propriedade de vida encapsulada
             target.death_sound.play()
             target.kill()
+            if hasattr(target, 'xp_points'):
+                self.event_manager.notify({
+                    'type': 'mob_defeated',
+                    'xp_points': target.xp_points
+                })
 
 
     def reset_attack_state(self):

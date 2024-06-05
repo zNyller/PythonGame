@@ -18,9 +18,11 @@ class Mob(pygame.sprite.Sprite):
     """
 
     MAX_LIFE = 50
-    STRENGTH = 3
-    INITIAL_POSITION = (150, 320)
+    STRENGTH = 10
+    INITIAL_POSITION = (150, 435)
     MOVE_SPEED = 0.5
+    ATTACK_RANGE = 65
+    XP_POINTS = 10
 
 
     def __init__(self, name, images, sounds, event_manager):
@@ -32,6 +34,7 @@ class Mob(pygame.sprite.Sprite):
         self._life = self.MAX_LIFE
         self.strength = self.STRENGTH
         self.speed = self.MOVE_SPEED
+        self.xp_points = self.XP_POINTS
 
         # Imagem e posição
         self.default_image = images["default"]
@@ -44,7 +47,8 @@ class Mob(pygame.sprite.Sprite):
         # Barra de vida
         self.life_bar_component = LifeBarComponent(self, event_manager, width=40, height=8, color=RED)
         # Atributos de combate
-        self.attack_component = BasicAttackComponent(self, self.strength, 25, sounds["hit_player"], 30, self.event_manager)
+        self.attack_range = self.ATTACK_RANGE
+        self.attack_component = BasicAttackComponent(self, self.strength, 25, self.attack_range, sounds["hit_player"], 30, self.event_manager)
         self.receive_damage_sound = sounds["scream"]
         self.death_sound = sounds["blood_pop"]
 
