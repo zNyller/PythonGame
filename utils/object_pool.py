@@ -7,7 +7,8 @@ class ObjectPool:
     def get(self, *args, **kwargs):
         if self.pool:
             obj = self.pool.pop()
-            obj.reset() # Resetar objeto para o estado inicial
+            if hasattr(obj, 'reset'):
+                obj.reset() # Resetar objeto para o estado inicial
             return obj
         else:
             return self.factory(*args, **kwargs)

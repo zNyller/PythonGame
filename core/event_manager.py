@@ -37,9 +37,16 @@ class EventManager:
 
         Args:
         - event (dict): Dicionário contendo informações sobre o evento, incluindo o tipo do evento ('type').
+
+        Returns:
+        - O resultado do primeiro listener que retornar um valor válido.
+        - Retorna None se nenhum listener retornar um valor válido.
         """
 
-        event_type = event['type'] # Obtém o tipo de evento do dicionário de evento
+        event_type = event.get('type') # Obtém o tipo de evento do dicionário de evento
         if event_type in self.listeners:
             for listener in self.listeners[event_type]:
-                listener.notify(event) # Chama o método `notify(event)` de cada listener registrado
+                result = listener.notify(event) # Chama o método `notify(event)` do listener e armazena o resultado
+                if result is not None:
+                    return result
+        return None

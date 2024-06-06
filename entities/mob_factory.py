@@ -10,6 +10,9 @@ class MobFactory:
         self.sprite_manager = sprite_manager
         self.mob_pool = ObjectPool(self.create_mob)
 
+        self.event_manager.subscribe('release_mob', self)
+        self.event_manager.subscribe('get_mob', self)
+
 
     def create_mob(self, name):
         """
@@ -37,10 +40,16 @@ class MobFactory:
     def get_mob(self, name):
         """Retorna um mob do pool, resetando-o para o estado inicial."""
         mob = self.mob_pool.get(name)
-        mob.reset()
         return mob
     
 
     def release_mob(self, mob):
         """Libera um mob de volta para o pool de objetos."""
         self.mob_pool.release(mob)
+
+
+    def notify(self, event):
+        if event['type'] == 'release_mob':
+            self.release_mob(event['mob'])
+        if event['type'] == 'get_mob':
+            return self.get_mob(event['name'])

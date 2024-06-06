@@ -14,4 +14,4 @@ class ScreenManager:
         """Desenha a janela e a imagem de fundo."""
         
         self.screen.fill(BLACK)
-        self.screen.blit(resource_manager.get_image('camping'), (0, 0))
+        self.screen.blit(resource_manager.get_image('background'), (0, 0))

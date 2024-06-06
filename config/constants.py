@@ -3,8 +3,8 @@ SCREEN_WIDTH = 1024
 SCREEN_HEIGHT = 768
 
 # Limite de movimentos
-LEFT_BOUNDARY = 100
-RIGHT_BOUNDARY = 900
+LEFT_BOUNDARY = 10
+RIGHT_BOUNDARY = 1000
 
 # Diretórios de recursos
 IMAGES_DIR = 'resources/images'

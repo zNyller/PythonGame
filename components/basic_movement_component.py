@@ -1,5 +1,6 @@
 import pygame
 from components.movement_component import MovementComponent
+from config.constants import LEFT_BOUNDARY, RIGHT_BOUNDARY
 
 class BasicMovementComponent(MovementComponent):
     """
@@ -13,6 +14,12 @@ class BasicMovementComponent(MovementComponent):
         self.movement_speed = movement_speed
 
 
+    def update(self, player_rect):
+        self.handle_movements()
+        self.sync_player_rect(player_rect)
+        self.limits_movements(LEFT_BOUNDARY, RIGHT_BOUNDARY)
+
+
     def handle_movements(self):
         """Gerencia os movimentos com base na tecla pressionada"""
 
@@ -23,6 +30,11 @@ class BasicMovementComponent(MovementComponent):
         if keys[pygame.K_d]:
             # Move para a direita
             self.entity_rect.x += self.movement_speed
+
+
+    def sync_player_rect(self, player_rect):
+        """Sincroniza o centro do player_rect com o centro de entity_rect do componente"""
+        player_rect.centerx = self.entity_rect.centerx
 
 
     def limits_movements(self, left_boundary, right_boundary):
