@@ -17,11 +17,13 @@ class PlayerFactory:
         """
 
         spritesheet = self.resource_manager.get_image('player_spritesheet')
+        attack_spritesheet = self.resource_manager.get_image('player_attacking')
         player_sprites = [self.sprite_manager.get_sprite(spritesheet, *coords) for coords in self.sprite_manager.player_sprite_coords]
-
+        attack_sprites = [self.sprite_manager.get_sprite(attack_spritesheet, *coords) for coords in self.sprite_manager.attack_sprite_coords]
+        
         images = {
             'default': player_sprites,
-            'attacking': self.resource_manager.get_image('player_attacking'),
+            'attacking': attack_sprites,
             'stats_interface': self.resource_manager.get_image('stats_interface'),
             'life_bar': self.resource_manager.get_image('life_bar'),
             'xp_bar': self.resource_manager.get_image('xp_bar')

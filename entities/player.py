@@ -1,7 +1,6 @@
 import pygame
-from components.basic_attack_component import BasicAttackComponent
+from components.player_attack_component import PlayerAttackComponent
 from components.basic_movement_component import BasicMovementComponent
-from components.life_bar_component import LifeBarComponent
 from components.stats_bar_component import StatsBarComponent
 from entities.level_manager import LevelManager
 
@@ -12,8 +11,6 @@ class Player(pygame.sprite.Sprite):
     Atributos:
         rect: Posição e tamanho do retângulo que envolverá a imagem do player
         mask: Cria uma máscara de colisão a partir da imagem do player
-        attack_damage (int): Variável para configurar a força do ataque do player
-        attack_duration (int): Variável para definir a duração do ataque
     """
 
     # Constants
@@ -22,7 +19,7 @@ class Player(pygame.sprite.Sprite):
     INITIAL_POSITION = (600, 586)
     MOVE_SPEED = 4
     SWORD_DAMAGE = 10
-    ATTACK_DURATION = 20
+    ATTACK_DURATION = 65
     ATTACK_COOLDOWN = 21
     ATTACK_RANGE = 70
     INITIAL_XP = 100
@@ -43,15 +40,11 @@ class Player(pygame.sprite.Sprite):
         # Imagem e posição
         self.animation_state = 'default' # Estado de animação inicial
         self.animation_frames = images['default'] # Conjunto de frames de animação
+        self.attack_frames = images['attacking'] # Conjunto de frames de ataque
         self.current_frame_index = 0 # Índice atual do frame de animação
         self.image = self.animation_frames[self.current_frame_index]
-       #self.attacking_image = images['attacking']
         self.rect = self.image.get_rect(center = self.INITIAL_POSITION)
         self.mask = pygame.mask.from_surface(self.image)
-
-        # Barra de vida
-        #self.life_bar_component = LifeBarComponent(self, event_manager, width=40, height=8, color=GREEN)
-        self.stats_bar_component = StatsBarComponent(self, images['stats_interface'], images['life_bar'], images['xp_bar'])
 
         # Atributos de combate
         self.attack_damage = self.SWORD_DAMAGE + self.strength
@@ -61,10 +54,11 @@ class Player(pygame.sprite.Sprite):
         self.attack_sound = sounds["attacking"]
         self.receive_damage_sound = sounds["hit"]
         self.death_sound = sounds["game_over"]
-        self.attack_component = BasicAttackComponent(self, self.attack_damage, self.attack_duration, self.attack_range, self.attack_sound, self.attack_cooldown, self.event_manager)
-        
+        #self.attack_component = BasicAttackComponent(self, self.attack_damage, self.attack_duration, self.attack_range, self.attack_sound, self.attack_cooldown, self.event_manager)
+        self.attack_component = PlayerAttackComponent(self, self.attack_damage, self.attack_duration, self.attack_sound, self.event_manager)
+        self.stats_bar_component = StatsBarComponent(self, images['stats_interface'], images['life_bar'], images['xp_bar'])
         # Movimento
-        self.movement_component = BasicMovementComponent(self.rect, self.speed)
+        self.movement_component = BasicMovementComponent(self.rect, self.speed, self.event_manager)
 
         self.level_manager = LevelManager(self)
         self.event_manager.subscribe('mob_defeated', self)
@@ -77,10 +71,11 @@ class Player(pygame.sprite.Sprite):
     def update(self, mobs_sprites):
         """Atualiza o estado do jogador"""
         
+        self.update_animation()
         self.handle_events()
         self.movement_component.update(self.rect)
-        self.update_animation()
-        self.attack_component.update(mobs_sprites)
+        #self.attack_component.update(mobs_sprites)
+        self.attack_component.update()
 
 
     def update_animation(self):
@@ -89,6 +84,7 @@ class Player(pygame.sprite.Sprite):
         if self.animation_counter >= len(self.animation_frames):
             self.animation_counter = 0
         self.current_frame_index = int(self.animation_counter)
+        #print(f'frame_animation: {self.current_frame_index}')
         self.image = self.animation_frames[self.current_frame_index]
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(center=self.rect.center)
@@ -106,11 +102,11 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_SPACE]:
             self.attack_component.attack()
 
-    # Encapsulando o acesso à life (@property é usado para definir o método 'life' como uma propriedade da classe Player.)
+    # Encapsulando o acesso à life (@property é usado para definir o método 'life' como uma propriedade da classe Player.
     @property
     def life(self):
         """Aqui, o método life é uma propriedade somente leitura.
-        Quando você acessar player.life, ele irá retornar o valor atual de self._life"""
+        Quando você acessar player.life, irá retornar o valor atual de self._life"""
         return self._life
     
 

@@ -22,6 +22,18 @@ class SpriteManager:
             (0, 296, 280, 148),  # Sprite 5 (terceira linha, primeira coluna)
         ]
 
+        self.attack_sprite_coords = [
+            (245, 64, 244, 134), # [1/1]
+            (750, 40, 244, 162), # [2/1]
+            (1172, 0, 232, 200), # [3/1]
+            (0, 254, 368, 142), # [1/2]
+            (506, 204, 356, 196), # [2/2]
+            (996, 254, 368, 142), # [3/2]
+            (222, 398, 232, 200), # [1/3]
+            (750, 432, 244, 162), # [2/3]
+            (1244, 462, 244, 134) # [3/3]
+        ]
+
 
     def add_player(self, player):
         """Adiciona aos grupos de sprites."""
@@ -52,7 +64,9 @@ class SpriteManager:
                 entity.draw_stats_bar(screen)
             else:
                 entity.draw_life_bar(screen)
-        self.all_sprites.draw(screen)
+
+            screen.blit(entity.image, entity.rect)
+        #self.all_sprites.draw(screen)
     
 
     def reset_game(self):

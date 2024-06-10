@@ -17,7 +17,7 @@ class ResourceManager:
             self.images['background'] = pygame.image.load(f'{IMAGES_DIR}/background.png')
             self.images['camping'] = pygame.image.load(f'{IMAGES_DIR}/camping.jpg')
             self.images['player'] = pygame.image.load(f'{IMAGES_DIR}/guts_size.png').convert_alpha()
-            self.images['player_attacking'] = pygame.image.load(f'{IMAGES_DIR}/guts_attack.png').convert_alpha()
+            self.images['player_attacking'] = pygame.image.load(f'{IMAGES_DIR}/attack_spritesheet.png').convert_alpha()
             self.images['player_spritesheet'] = pygame.image.load(f'{IMAGES_DIR}/player_spritesheet.png').convert_alpha()
             self.images['stats_interface'] = pygame.image.load(f'{IMAGES_DIR}/stats_interface.png').convert_alpha()
             self.images['life_bar'] = pygame.image.load(f'{IMAGES_DIR}/life_bar.png').convert_alpha()

@@ -8,10 +8,14 @@ class BasicMovementComponent(MovementComponent):
 
     Este componente gerencia o movimento com base nas teclas pressionadas e limita entre as bordas da janela
     """
-    def __init__(self, entity_rect, movement_speed):
+    def __init__(self, entity_rect, movement_speed, event_manager):
         super().__init__()
         self.entity_rect = entity_rect
         self.movement_speed = movement_speed
+        self.event_manager = event_manager
+        self.state = 'idle'
+
+        self.event_manager.subscribe('player_attack', self)
 
 
     def update(self, player_rect):
@@ -23,13 +27,16 @@ class BasicMovementComponent(MovementComponent):
     def handle_movements(self):
         """Gerencia os movimentos com base na tecla pressionada"""
 
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_a]:
-            # Move para a esquerda
-            self.entity_rect.x -= self.movement_speed
-        if keys[pygame.K_d]:
-            # Move para a direita
-            self.entity_rect.x += self.movement_speed
+        if self.state == 'idle':
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_a]:
+                # Move para a esquerda
+                self.entity_rect.x -= self.movement_speed
+            if keys[pygame.K_d]:
+                # Move para a direita
+                self.entity_rect.x += self.movement_speed
+        elif self.state == 'attacking':
+            ...
 
 
     def sync_player_rect(self, player_rect):
@@ -42,3 +49,10 @@ class BasicMovementComponent(MovementComponent):
 
         self.entity_rect.left = max(self.entity_rect.left, left_boundary)
         self.entity_rect.right = min(self.entity_rect.right, right_boundary)
+
+
+    def notify(self, event):
+        if event['type'] == 'player_attack' and event['state'] == 'start':
+            self.state = 'attacking'
+        elif event['type'] == 'player_attack' and event['state'] == 'end':
+            self.state = 'idle'
