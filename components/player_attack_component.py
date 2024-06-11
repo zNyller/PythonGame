@@ -1,3 +1,7 @@
+import logging
+# Configuração básica de logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
 import pygame
 from components.attack_component import AttackComponent
 
@@ -19,8 +23,9 @@ class PlayerAttackComponent(AttackComponent):
 
     def attack(self):
         if self.state == 'idle':
-            self.event_manager.notify({'type': 'player_attack', 'state': 'start'})
+            logging.debug('Starting attack')
             self.state = 'attacking'
+            self.event_manager.notify({'type': 'player_attack', 'state': 'start'})
             self.player.image = self.player.attack_frames[self.current_frame_index]
             self.sound.play()
             self.animation_counter = 0 # Reseta
@@ -36,6 +41,7 @@ class PlayerAttackComponent(AttackComponent):
             else:
                 self.state = 'idle'
                 self.event_manager.notify({'type': 'player_attack', 'state': 'end'})
+                logging.debug('Attack ended, changing state to idle')
                 self.duration_counter = 0
 
 
@@ -59,7 +65,6 @@ class PlayerAttackComponent(AttackComponent):
         self.player.image = self.player.attack_frames[self.current_frame_index]
         self.mask = pygame.mask.from_surface(self.player.image)
         
-        # Ajusta o retângulo do jogador para manter o centro e a base originais
         self.player.rect = self.player.image.get_rect()
         self.player.rect.centerx = self.inital_rect.centerx  # Mantém o mesmo centro X que o retângulo inicial
         self.player.rect.bottom = self.inital_rect.bottom  # Mantém o mesmo bottom (base) que o retângulo inicial

@@ -73,21 +73,21 @@ class Player(pygame.sprite.Sprite):
         
         self.update_animation()
         self.handle_events()
+        self.attack_component.update()
         self.movement_component.update(self.rect)
         #self.attack_component.update(mobs_sprites)
-        self.attack_component.update()
 
 
     def update_animation(self):
         """Atualiza a animação do sprite"""
-        self.animation_counter += self.animation_speed
-        if self.animation_counter >= len(self.animation_frames):
-            self.animation_counter = 0
-        self.current_frame_index = int(self.animation_counter)
-        #print(f'frame_animation: {self.current_frame_index}')
-        self.image = self.animation_frames[self.current_frame_index]
-        self.mask = pygame.mask.from_surface(self.image)
-        self.rect = self.image.get_rect(center=self.rect.center)
+        if self.animation_state == 'default':
+            self.animation_counter += self.animation_speed
+            if self.animation_counter >= len(self.animation_frames):
+                self.animation_counter = 0
+            self.current_frame_index = int(self.animation_counter)
+            self.image = self.animation_frames[self.current_frame_index]
+            self.mask = pygame.mask.from_surface(self.image)
+            self.rect = self.image.get_rect(center=self.rect.center)
 
 
     def draw_stats_bar(self, screen):

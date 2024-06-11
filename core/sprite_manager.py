@@ -66,7 +66,6 @@ class SpriteManager:
                 entity.draw_life_bar(screen)
 
             screen.blit(entity.image, entity.rect)
-        #self.all_sprites.draw(screen)
     
 
     def reset_game(self):
