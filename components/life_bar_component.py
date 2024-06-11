@@ -46,7 +46,6 @@ class LifeBarComponent:
 
     def update_life_bar(self):
         """Atualiza a barra de vida da entidade quando houver alteração."""
-
         self.current_life = self.entity.life
 
         if self.max_life > 0:

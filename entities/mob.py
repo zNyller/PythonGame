@@ -18,9 +18,9 @@ class Mob(pygame.sprite.Sprite):
     """
 
     MAX_LIFE = 50
-    STRENGTH = 35
-    INITIAL_POSITION = (150, 435)
-    MOVE_SPEED = 0.5
+    STRENGTH = 15
+    INITIAL_POSITION = (150, 520)
+    MOVE_SPEED = 1.5
     ATTACK_RANGE = 65
     XP_POINTS = 10
 

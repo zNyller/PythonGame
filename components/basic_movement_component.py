@@ -1,7 +1,3 @@
-import logging
-# Configuração básica de logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-
 import pygame
 from components.movement_component import MovementComponent
 from config.constants import LEFT_BOUNDARY, RIGHT_BOUNDARY
@@ -44,14 +40,10 @@ class BasicMovementComponent(MovementComponent):
 
 
     def move_left(self):
-        if self.state != 'attacking':
-            new_x = self.entity_rect.x - self.movement_speed
-            self.entity_rect.x = new_x
+        self.entity_rect.x -= self.movement_speed
 
     def move_right(self):
-        if self.state != 'attacking':
-            new_x = self.entity_rect.x + self.movement_speed
-            self.entity_rect.x = new_x
+        self.entity_rect.x += self.movement_speed
 
 
     def sync_player_rect(self, player_rect):
@@ -66,7 +58,5 @@ class BasicMovementComponent(MovementComponent):
 
 
     def notify(self, event):
-        logging.debug(f'Received event: {event}')
         if event['type'] == 'player_attack':
             self.state = 'attacking' if event['state'] == 'start' else 'idle'
-        logging.debug(f'Updated state to: {self.state}')

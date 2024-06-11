@@ -20,8 +20,6 @@ class Player(pygame.sprite.Sprite):
     MOVE_SPEED = 4
     SWORD_DAMAGE = 10
     ATTACK_DURATION = 65
-    ATTACK_COOLDOWN = 21
-    ATTACK_RANGE = 70
     INITIAL_XP = 100
 
 
@@ -49,15 +47,13 @@ class Player(pygame.sprite.Sprite):
         # Atributos de combate
         self.attack_damage = self.SWORD_DAMAGE + self.strength
         self.attack_duration = self.ATTACK_DURATION
-        self.attack_cooldown = self.ATTACK_COOLDOWN
-        self.attack_range = self.ATTACK_RANGE
         self.attack_sound = sounds["attacking"]
         self.receive_damage_sound = sounds["hit"]
         self.death_sound = sounds["game_over"]
-        #self.attack_component = BasicAttackComponent(self, self.attack_damage, self.attack_duration, self.attack_range, self.attack_sound, self.attack_cooldown, self.event_manager)
+
+        # Components
         self.attack_component = PlayerAttackComponent(self, self.attack_damage, self.attack_duration, self.attack_sound, self.event_manager)
         self.stats_bar_component = StatsBarComponent(self, images['stats_interface'], images['life_bar'], images['xp_bar'])
-        # Movimento
         self.movement_component = BasicMovementComponent(self.rect, self.speed, self.event_manager)
 
         self.level_manager = LevelManager(self)
@@ -73,7 +69,7 @@ class Player(pygame.sprite.Sprite):
         
         self.update_animation()
         self.handle_events()
-        self.attack_component.update()
+        self.attack_component.update(mobs_sprites)
         self.movement_component.update(self.rect)
         #self.attack_component.update(mobs_sprites)
 
@@ -115,6 +111,7 @@ class Player(pygame.sprite.Sprite):
         """@life.setter define um método life que é chamado quando você tenta definir o valor de player.life. 
         self._life = max(0, value) garante que a vida do jogador não se torne negativa."""
         self._life = max(0, value)
+        print(f'Reduzindo vida... Atual: {self._life}')
 
 
     def reduce_life(self, damage):

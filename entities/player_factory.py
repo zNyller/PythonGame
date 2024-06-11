@@ -38,6 +38,7 @@ class PlayerFactory:
 
         player = Player(images, sounds, self.event_manager)
         self.sprite_manager.add_player(player)
+        print(f'Retornado Player: {player}')
         return player
     
 
@@ -45,5 +46,4 @@ class PlayerFactory:
         """Recebe notificações de eventos."""
         if event['type'] == 'create_player':
             print("Evento create_player recebido!")
-            print(f"Retornando {self.create_player()}")
             return self.create_player()

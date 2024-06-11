@@ -29,8 +29,6 @@ class BasicAttackComponent(AttackComponent):
 
         if self.state == 'idle':
             self.state = 'attacking'
-            self.entity.image = self.entity.attacking_image
-            self.attack_sound.play()
             self.hit_targets.clear() # Limpa alvos atingidos no ataque anterior
             self.attack_duration = self.initial_attack_duration # Reseta a duração do ataque
 
@@ -54,13 +52,22 @@ class BasicAttackComponent(AttackComponent):
 
 
     def perform_attack(self, target_sprites):
-        """Realiza o ataque e verifica colisões com os alvos."""
-
         for target in target_sprites:
-            distance = int(pygame.math.Vector2(target.rect.center).distance_to(self.entity.rect.center))
-            if distance <= self.attack_range and target not in self.hit_targets:
-                self.inflict_damage(target)
-                self.hit_targets.add(target)
+            # Verifica a colisão apenas se o centro do mob estiver perto do centro do jogador
+            mob_center = self.entity.rect.center
+            player_center = target.rect.center
+            collision_distance = 158  # Define a distância máxima para considerar a colisão
+
+            if self.is_within_attack_range(mob_center, player_center, collision_distance):
+                if target not in self.hit_targets:
+                    self.entity.image = self.entity.attacking_image
+                    self.attack_sound.play()
+                    self.inflict_damage(target)
+                    self.hit_targets.add(target)
+
+    def is_within_attack_range(self, mob_center, player_center, collision_distance):
+        return (abs(mob_center[0] - player_center[0]) <= collision_distance and
+                abs(mob_center[1] - player_center[1]) <= collision_distance)
 
 
     def inflict_damage(self, target):
@@ -80,8 +87,8 @@ class BasicAttackComponent(AttackComponent):
         direction_x = target.rect.centerx - self.entity.rect.centerx
         if direction_x != 0:
             direction_x /= abs(direction_x) # Normaliza para obter -1 ou 1
-        recuo_distancia = 30
-        target.rect.centerx += direction_x * recuo_distancia
+        recuo_distancia = 70
+        self.entity.rect.centerx -= direction_x * recuo_distancia
 
         if target.life <= 0: # Usando a propriedade de vida encapsulada
             target.death_sound.play()
