@@ -1,14 +1,15 @@
 class LevelManager:
     def __init__(self, player):
         self.player = player
-        self.xp = 0
+        self.xp = self.player.xp
         self.level = 1
         self.xp_to_next_level = 100
         self.upgrade_points = 0
 
 
     def add_experience(self, amount):
-        self.xp += amount
+        print(f'+{amount}XP!')
+        self.player.xp += amount
         if self.xp >= self.xp_to_next_level:
             self.level_up()
 

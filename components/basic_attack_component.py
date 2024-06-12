@@ -38,7 +38,7 @@ class BasicAttackComponent(AttackComponent):
 
         if self.state == 'attacking':
             if self.attack_duration > 0:
-                self.perform_attack(target_sprites)
+                self._perform_attack(target_sprites)
                 self.attack_duration -= 1
             else:
                 self.reset_attack_state()
@@ -51,7 +51,7 @@ class BasicAttackComponent(AttackComponent):
                 self.state = 'idle'
 
 
-    def perform_attack(self, target_sprites):
+    def _perform_attack(self, target_sprites):
         for target in target_sprites:
             # Verifica a colisão apenas se o centro do mob estiver perto do centro do jogador
             mob_center = self.entity.rect.center
@@ -62,7 +62,7 @@ class BasicAttackComponent(AttackComponent):
                 if target not in self.hit_targets:
                     self.entity.image = self.entity.attacking_image
                     self.attack_sound.play()
-                    self.inflict_damage(target)
+                    self._inflict_damage(target)
                     self.hit_targets.add(target)
 
     def is_within_attack_range(self, mob_center, player_center, collision_distance):
@@ -70,7 +70,7 @@ class BasicAttackComponent(AttackComponent):
                 abs(mob_center[1] - player_center[1]) <= collision_distance)
 
 
-    def inflict_damage(self, target):
+    def _inflict_damage(self, target):
         """Inflige dano ao alvo, reproduz os respectivos sons e verifica se o alvo foi derrotado."""
 
         target.reduce_life(self.attack_damage)
@@ -84,11 +84,10 @@ class BasicAttackComponent(AttackComponent):
         })
 
         # Calcula a direção do recuo com base nas posições do atacante e do alvo
-        direction_x = target.rect.centerx - self.entity.rect.centerx
-        if direction_x != 0:
-            direction_x /= abs(direction_x) # Normaliza para obter -1 ou 1
-        recuo_distancia = 70
-        self.entity.rect.centerx -= direction_x * recuo_distancia
+        if target.rect.centerx >= self.entity.rect.centerx:
+            self.entity.rect.centerx -= 90
+        else:
+            self.entity.rect.centerx += 90
 
         if target.life <= 0: # Usando a propriedade de vida encapsulada
             target.death_sound.play()

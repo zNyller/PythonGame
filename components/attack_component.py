@@ -17,10 +17,10 @@ class AttackComponent(ABC):
 
 
     @abstractmethod
-    def perform_attack(self, target_sprites):
+    def _perform_attack(self, target_sprites):
         pass
 
 
     @abstractmethod
-    def inflict_damage(self, target):
+    def _inflict_damage(self, target):
         pass

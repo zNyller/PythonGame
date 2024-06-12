@@ -20,7 +20,7 @@ class Player(pygame.sprite.Sprite):
     MOVE_SPEED = 4
     SWORD_DAMAGE = 10
     ATTACK_DURATION = 65
-    INITIAL_XP = 100
+    INITIAL_XP = 0
 
 
     def __init__(self, images, sounds, event_manager):
@@ -32,7 +32,6 @@ class Player(pygame.sprite.Sprite):
         self._life = self.MAX_LIFE
         self.strength = self.INITIAL_STRENGTH
         self.speed = self.MOVE_SPEED
-
         self.xp = self.INITIAL_XP
 
         # Imagem e posição
@@ -71,7 +70,6 @@ class Player(pygame.sprite.Sprite):
         self.handle_events()
         self.attack_component.update(mobs_sprites)
         self.movement_component.update(self.rect)
-        #self.attack_component.update(mobs_sprites)
 
 
     def update_animation(self):
@@ -111,7 +109,6 @@ class Player(pygame.sprite.Sprite):
         """@life.setter define um método life que é chamado quando você tenta definir o valor de player.life. 
         self._life = max(0, value) garante que a vida do jogador não se torne negativa."""
         self._life = max(0, value)
-        print(f'Reduzindo vida... Atual: {self._life}')
 
 
     def reduce_life(self, damage):
