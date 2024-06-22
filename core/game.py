@@ -21,7 +21,7 @@ class Game:
 
         self.player_factory = PlayerFactory(self.event_manager, self.resource_manager, self.sprite_manager)
         self.mob_factory = MobFactory(self.event_manager, self.resource_manager, self.sprite_manager)
-        self.player = self.event_manager.notify({'type': 'create_player'})
+        self.player = self.player_factory.create_player()
         self.mob = self.mob_factory.create_mob("Demon")
 
 

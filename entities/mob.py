@@ -22,7 +22,7 @@ class Mob(pygame.sprite.Sprite):
     INITIAL_POSITION = (150, 520)
     MOVE_SPEED = 1.5
     ATTACK_RANGE = 65
-    XP_POINTS = 10
+    XP_POINTS = 20
 
 
     def __init__(self, name, images, sounds, event_manager):

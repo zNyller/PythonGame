@@ -1,22 +1,23 @@
 class LevelManager:
-    def __init__(self, player):
+    def __init__(self, player, event_manager):
         self.player = player
-        self.xp = self.player.xp
         self.level = 1
         self.xp_to_next_level = 100
         self.upgrade_points = 0
+        self.event_manager = event_manager
+
+        self.event_manager.subscribe('mob_defeated', self)
 
 
     def add_experience(self, amount):
-        print(f'+{amount}XP!')
         self.player.xp += amount
-        if self.xp >= self.xp_to_next_level:
+        if self.player.xp >= self.xp_to_next_level:
             self.level_up()
 
 
     def level_up(self):
         self.level += 1
-        self.xp -= self.xp_to_next_level
+        self.player.xp -= self.xp_to_next_level
         self.xp_to_next_level = int(self.xp_to_next_level * 1.5)
         self.upgrade_points += 1
         self.apply_upgrades()
@@ -24,6 +25,10 @@ class LevelManager:
 
     def apply_upgrades(self):
         if self.upgrade_points > 0:
-            self.player.upgrade_stats(5, 3)
-            self.player.strength += 1
+            self.player.attack_damage += 3
             self.upgrade_points -= 1
+
+
+    def notify(self, event):
+        if event['type'] == 'mob_defeated':
+            self.add_experience(event['xp_points'])

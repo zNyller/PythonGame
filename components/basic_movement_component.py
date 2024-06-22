@@ -30,6 +30,7 @@ class BasicMovementComponent(MovementComponent):
             self.sync_player_rect(player_rect)
         self.limits_movements(LEFT_BOUNDARY, RIGHT_BOUNDARY)
 
+
     def handle_movements(self):
         keys = pygame.key.get_pressed()
 

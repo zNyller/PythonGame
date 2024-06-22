@@ -71,7 +71,7 @@ class BasicAttackComponent(AttackComponent):
 
 
     def _inflict_damage(self, target):
-        """Inflige dano ao alvo, reproduz os respectivos sons e verifica se o alvo foi derrotado."""
+        """ Inflige dano ao alvo e lida com os eventos relativos. """
 
         target.reduce_life(self.attack_damage)
         target.receive_damage_sound.play()
@@ -82,21 +82,24 @@ class BasicAttackComponent(AttackComponent):
             'target': target,
             'damage': self.attack_damage
         })
+        
+        self._knock_back_target(target)
+        self._check_target_life(target)
 
-        # Calcula a direção do recuo com base nas posições do atacante e do alvo
+
+    def _knock_back_target(self, target):
+        """ Calcula a direção do recuo com base nas posições do atacante e do alvo. """
         if target.rect.centerx >= self.entity.rect.centerx:
             self.entity.rect.centerx -= 90
         else:
             self.entity.rect.centerx += 90
 
-        if target.life <= 0: # Usando a propriedade de vida encapsulada
+
+    def _check_target_life(self, target):
+        """ Verifica se a vida do alvo chegou a 0 e lida de acordo. """
+        if target.life <= 0:
             target.death_sound.play()
             target.kill()
-            if hasattr(target, 'xp_points'):
-                self.event_manager.notify({
-                    'type': 'mob_defeated',
-                    'xp_points': target.xp_points
-                })
 
 
     def reset_attack_state(self):
