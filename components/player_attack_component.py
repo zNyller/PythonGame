@@ -2,17 +2,21 @@ import pygame
 from components.attack_component import AttackComponent
 
 class PlayerAttackComponent(AttackComponent):
+    """ Classe para gerenciar o componente de ataque do player. """
 
     ATTACK_DURATION = 44
+    ANIMATION_SPEED = 0.20
+    STATE_IDLE = 'idle'
+    STATE_ATTACKING = 'attacking'
 
-    def __init__(self, player, sound, event_manager):
+    def __init__(self, player, sound, event_manager) -> None:
         super().__init__()
         self.player = player
-        self.attack_duration = self.ATTACK_DURATION
         self.sound = sound
         self.event_manager = event_manager
-        self.state = 'idle'
-        self.animation_speed = 0.20
+        self.state = self.STATE_IDLE
+        self.attack_duration = self.ATTACK_DURATION
+        self.animation_speed = self.ANIMATION_SPEED
         self.animation_counter = 0
         self.current_frame_index = 0
         self.duration_counter = 0
@@ -21,26 +25,25 @@ class PlayerAttackComponent(AttackComponent):
         self.hit_targets = set()
 
 
-    def attack(self):
+    def attack(self) -> None:
         """ Inicia o ataque se estiver inativo e notifica os listeners. """
-        if self.state == 'idle':
-            print(self.player.rect.x)
-            self.state = 'attacking'
+        if self.state == self.STATE_IDLE:
+            self.state = self.STATE_ATTACKING
             self.event_manager.notify({'type': 'player_attack', 'state': 'start'})
             self.duration_counter = self.attack_duration
             self.sound.play()
-            self._reset_attack_hitbox()
             self._update_player_image()
             self._update_attack_hitbox()
 
 
-    def update(self):
-        """ Atualiza o estado de ataque. """
-        if self.state == 'attacking':
+    def update(self) -> None:
+        """ Atualiza a posição do player e o estado de ataque. """
+        self.player_rect_x = self.player.rect.x
+        if self.state == self.STATE_ATTACKING:
             self._continue_attack()
 
 
-    def _continue_attack(self):
+    def _continue_attack(self) -> None:
         """ Gerencia a animação de ataque. """
         if self.duration_counter > 0:
             self._attack_animation()
@@ -50,59 +53,7 @@ class PlayerAttackComponent(AttackComponent):
             self._reset_to_idle()
 
 
-    def _reset_to_idle(self):
-        """ Reseta o estado de ataque para inativo e notifica os listeners. """
-        self.state = 'idle'
-        self.event_manager.notify({'type': 'player_attack', 'state': 'end'})
-        self.animation_counter = 0
-        self.current_frame_index = 0
-        self.duration_counter = 0
-        self.hit_targets.clear()
-
-
-    def _perform_attack(self):
-        """ Verifica a colisão com alvos e inflige dano. """
-        target_sprites = self.event_manager.notify({'type': 'get_mob_sprites'})
-        for target in target_sprites:
-            if self.attack_hitbox.colliderect(target.rect) and target not in self.hit_targets:
-                self._inflict_damage(target)
-                self.hit_targets.add(target)
-
-
-    def _inflict_damage(self, target):
-        """ Inflige dano ao alvo e lida com os eventos relativos. """
-        self.damage = self.player.attack_damage
-        print(f"Inflicting {self.damage} damage on target")
-        target.reduce_life(self.damage)
-        target.receive_damage_sound.play()
-        self.event_manager.notify({'type': 'damage_event', 'target': target, 'damage': self.damage})
-        self._knockback_target(target)
-        self._check_target_life(target)
-
-
-    def _knockback_target(self, target):
-        """ Aplica efeito de recuo no alvo com base na posição do player. """
-        if target.rect.centerx <= self.player.rect.centerx:
-            print(f'Direta! Target: {target.rect.centerx}! Player: {self.player.rect.centerx}')
-            target.rect.centerx -= 90
-        else:
-            print(f'Esquerda! Target: {target.rect.centerx}! Player: {self.player.rect.centerx}')
-            target.rect.centerx += 90
-
-
-    def _check_target_life(self, target):
-        """ Verifica se a vida do alvo chegou a zero e lida de acordo. """
-        if target.life <= 0:
-            target.death_sound.play()
-            target.kill()
-            if hasattr(target, 'xp_points'):
-                self.event_manager.notify({
-                    'type': 'mob_defeated', 
-                    'xp_points': target.xp_points
-                })
-
-
-    def _attack_animation(self):
+    def _attack_animation(self) -> None:
         """ Avança os frames da animação de ataque. """
         self.animation_counter += self.animation_speed
         if self.animation_counter >= 1:
@@ -112,15 +63,15 @@ class PlayerAttackComponent(AttackComponent):
         self._update_player_image()
 
 
-    def _update_player_image(self):
+    def _update_player_image(self) -> None:
         """ Atualiza a imagem do player com base no frame de ataque atual. """
         self.player.image = self.player.attack_frames[self.current_frame_index]
         self.player.rect = self.player.image.get_rect()
-        self.player.rect.centerx = self.initial_rect.centerx
+        self.player.rect.centerx = self.player_rect_x
         self.player.rect.bottom = self.initial_rect.bottom
 
 
-    def _update_attack_hitbox(self):
+    def _update_attack_hitbox(self) -> None:
         """ Atualiza a hitbox de ataque com base no frame atual. """
         if self.current_frame_index < 3:
             self.attack_hitbox.size = (50, 50)
@@ -132,6 +83,49 @@ class PlayerAttackComponent(AttackComponent):
         self.attack_hitbox.bottom = self.player.rect.bottom
 
 
-    def _reset_attack_hitbox(self):
+    def _reset_to_idle(self) -> None:
+        """ Reseta o estado de ataque e notifica os listeners. """
+        self.state = self.STATE_IDLE
+        self.event_manager.notify({'type': 'player_attack', 'state': 'end'})
+        self.animation_counter = 0
+        self.current_frame_index = 0
+        self.duration_counter = 0
+        self.hit_targets.clear()
+        self._reset_attack_hitbox()
+
+
+    def _perform_attack(self) -> None:
+        """ Verifica a colisão com alvos e inflige dano. """
+        target_sprites = self.event_manager.notify({'type': 'get_mob_sprites'})
+        for target in target_sprites:
+            if self.attack_hitbox.colliderect(target.rect) and target not in self.hit_targets:
+                self._inflict_damage(target)
+                self.hit_targets.add(target)
+
+
+    def _inflict_damage(self, target) -> None:
+        """ Inflige dano ao alvo e lida com os eventos relativos. """
+        damage = self.player.attack_damage
+        target.receive_damage(damage)
+        self._knockback_target(target)
+        self._check_target_life(target)
+
+
+    def _knockback_target(self, target) -> None:
+        """ Aplica efeito de recuo no alvo com base na posição do player. """
+        if target.rect.centerx <= self.player.rect.centerx:
+            target.rect.centerx -= 90
+        else:
+            target.rect.centerx += 90
+
+
+    def _check_target_life(self, target) -> None:
+        """ Verifica se a vida do alvo chegou a zero e lida de acordo. """
+        if target.life <= 0:
+            target.defeat()
+            target.kill()
+
+
+    def _reset_attack_hitbox(self) -> None:
         """ Reseta a hitbox do ataque com base na posição do player. """
         self.attack_hitbox = pygame.Rect(self.player.rect.centerx - 25, self.player.rect.bottom - 50, 50, 50)

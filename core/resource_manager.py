@@ -11,7 +11,7 @@ class ResourceManager:
 
 
     def load_resources(self):
-        """Carrega imagens e sons necessários"""
+        """ Carrega imagens e sons necessários. """
 
         try:
             self.images['background'] = pygame.image.load(f'{IMAGES_DIR}/background.png')

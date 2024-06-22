@@ -4,8 +4,7 @@ from components.life_bar_component import LifeBarComponent
 from components.basic_attack_component import BasicAttackComponent
 
 class Mob(pygame.sprite.Sprite):
-    """
-    Uma classe para representar os mobs do jogo.
+    """ Uma classe para representar os mobs do jogo.
 
     Atributos:
         life (int): Pontos de vida do mob
@@ -22,7 +21,7 @@ class Mob(pygame.sprite.Sprite):
     INITIAL_POSITION = (150, 520)
     MOVE_SPEED = 1.5
     ATTACK_RANGE = 65
-    XP_POINTS = 20
+    XP_POINTS = 40
 
 
     def __init__(self, name, images, sounds, event_manager):
@@ -63,26 +62,34 @@ class Mob(pygame.sprite.Sprite):
         self.event_manager.notify(event)
 
 
-    def update(self, player_sprites):
-        """Atualiza a barra de vida e verifica colisão com o player para mover."""
-
-        self.life_bar_component.update_life_bar()
-        self.attack_component.update(player_sprites)
-
-        hit_player = pygame.sprite.spritecollideany(self, player_sprites, pygame.sprite.collide_mask)
-        if not hit_player:
-            self.move()
-        elif self.attack_component.state == 'idle':
-            self.attack_component.attack()
-
-
     def draw_life_bar(self, screen):
         self.life_bar_component.draw_life_bar(screen)
 
 
-    def move(self):
-        """Move o mob e limita o movimento dentro das bordas."""
+    def update(self, player_sprites):
+        """ Atualiza a posição da barra de vida e verifica colisão com o player para mover. """
 
+        self.life_bar_component.update_life_bar()
+        self.attack_component.update(player_sprites)
+        self._check_colision(player_sprites)
+
+
+    def defeat(self):
+        """ Efeito de morte e notifica os listeners. """
+        self.death_sound.play()
+        self.event_manager.notify({'type': 'mob_defeated', 'xp_points': self.xp_points})
+
+
+    def _check_colision(self, player_sprites):
+        hit_player = pygame.sprite.spritecollideany(self, player_sprites, pygame.sprite.collide_mask)
+        if not hit_player:
+            self._move()
+        elif self.attack_component.state == 'idle':
+            self.attack_component.attack()
+
+
+    def _move(self):
+        """ Move o mob e limita o movimento dentro das bordas. """
         self.rect.x += self.speed
         if self.rect.left < LEFT_BOUNDARY or self.rect.right > RIGHT_BOUNDARY:
             self.rect.center = self.INITIAL_POSITION
@@ -98,6 +105,8 @@ class Mob(pygame.sprite.Sprite):
         self._life = max(0, value)
 
 
-    # Método para reduzir a vida
-    def reduce_life(self, damage):
+    def receive_damage(self, damage):
+        """ Recebe a quantidade de dano e notifica os listeners. """
         self.life -= damage
+        self.receive_damage_sound.play()
+        self.event_manager.notify({'type': 'damage_event', 'target': self, 'damage': damage})
