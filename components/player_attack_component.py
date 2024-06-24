@@ -21,7 +21,7 @@ class PlayerAttackComponent(AttackComponent):
         self.current_frame_index = 0
         self.duration_counter = 0
         self.initial_rect = player.rect.copy()
-        self.attack_hitbox = pygame.Rect(0, 0, 50, 50)
+        self.attack_hitbox = pygame.Rect(self.player.rect.centerx, self.player.rect.centery, 50, 50)
         self.hit_targets = set()
 
 
@@ -38,7 +38,7 @@ class PlayerAttackComponent(AttackComponent):
 
     def update(self) -> None:
         """ Atualiza a posição do player e o estado de ataque. """
-        self.player_rect_x = self.player.rect.x
+        self.player_x = self.player.rect.x
         if self.state == self.STATE_ATTACKING:
             self._continue_attack()
 
@@ -58,17 +58,17 @@ class PlayerAttackComponent(AttackComponent):
         self.animation_counter += self.animation_speed
         if self.animation_counter >= 1:
             self.animation_counter = 0
-            self.current_frame_index = (self.current_frame_index + 1) % len(self.player.attack_frames)
+            self.current_frame_index = (self.current_frame_index + 1) % len(self.player.cannon_frames)
             self._update_attack_hitbox()
         self._update_player_image()
 
 
     def _update_player_image(self) -> None:
         """ Atualiza a imagem do player com base no frame de ataque atual. """
-        self.player.image = self.player.attack_frames[self.current_frame_index]
+        self.player.image = self.player.cannon_frames[self.current_frame_index]
         self.player.rect = self.player.image.get_rect()
-        self.player.rect.centerx = self.player_rect_x
-        self.player.rect.bottom = self.initial_rect.bottom
+        self.player.rect.centerx = self.player_x
+        self.player.rect.bottom = self.initial_rect.bottom + 6
 
 
     def _update_attack_hitbox(self) -> None:
@@ -76,9 +76,10 @@ class PlayerAttackComponent(AttackComponent):
         if self.current_frame_index < 3:
             self.attack_hitbox.size = (50, 50)
         elif 3 <= self.current_frame_index < 6:
-            self.attack_hitbox.size = (330, 250)
+            self.attack_hitbox.size = (370, 250)
         else:
             self.attack_hitbox.size = (50, 50)
+            
         self.attack_hitbox.centerx = self.player.rect.centerx
         self.attack_hitbox.bottom = self.player.rect.bottom
 

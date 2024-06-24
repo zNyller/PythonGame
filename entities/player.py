@@ -13,7 +13,7 @@ class Player(pygame.sprite.Sprite):
     INITIAL_POSITION = (600, 586)
     MAX_LIFE = 100
     MOVE_SPEED = 6
-    SWORD_DAMAGE = 50
+    SWORD_DAMAGE = 40
 
 
     def __init__(self, images, sounds, event_manager) -> None:
@@ -31,6 +31,7 @@ class Player(pygame.sprite.Sprite):
         self.animation_state = 'default' # Estado de animação inicial
         self.animation_frames = images['default'] # Conjunto de frames de animação
         self.attack_frames = images['attacking'] # Conjunto de frames de ataque
+        self.cannon_frames = images['cannon']
         self.current_frame_index = 0 # Índice atual do frame de animação
         self.image = self.animation_frames[self.current_frame_index]
         self.rect = self.image.get_rect(center = self.INITIAL_POSITION) # Posição e tamanho do retângulo que envolverá a imagem do player
@@ -63,47 +64,59 @@ class Player(pygame.sprite.Sprite):
     def update(self) -> None:
         """ Atualiza o estado do jogador. """
         
-        self.update_animation()
+        self._update_animation()
         self.handle_events()
-        self.update_components()
+        self._update_components()
 
 
-    def update_animation(self) -> None:
+    def handle_events(self) -> None:
+        """ Lida com os eventos do jogador, como ataques. """
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE]:
+            self.attack_component.attack()
+
+
+    def receive_damage(self, damage) -> None:
+        """ Reduz a vida do player e notifica os listeners. """
+        self.life -= damage
+        self.receive_damage_sound.play()
+        self.event_manager.notify({'type': 'damage_event', 'target': self, 'damage': damage})
+
+
+    def reset(self) -> None:
+        """ Reseta a posição e vida do jogador. """
+        self.rect.center = self.INITIAL_POSITION
+        self._life = self.MAX_LIFE
+
+
+    def _update_animation(self) -> None:
         """ Atualiza a animação do sprite. """
         if self.animation_state == 'default':
-            self.increment_animation_counter()
-            self.update_current_frame()
-            self.update_image_and_mask()
+            self._increment_animation_counter()
+            self._update_current_frame()
+            self._update_image_and_mask()
 
 
-    def increment_animation_counter(self) -> None:
+    def _increment_animation_counter(self) -> None:
         """ Incrementa o contador de animação. """
         self.animation_counter += self.animation_speed
         if self.animation_counter >= len(self.animation_frames):
             self.animation_counter = 0
 
 
-    def update_current_frame(self) -> None:
+    def _update_current_frame(self) -> None:
         """ Atualiza o frame atual da animação. """
         self.current_frame_index = int(self.animation_counter)
 
 
-    def update_image_and_mask(self) -> None:
+    def _update_image_and_mask(self) -> None:
         """ Atualiza a imagem e a máscara do sprite. """
         self.image = self.animation_frames[self.current_frame_index]
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(center=self.rect.center)
-        
-
-    def handle_events(self) -> None:
-        """ Lida com os eventos do jogador, como ataques. """
-
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
-            self.attack_component.attack()
 
 
-    def update_components(self) -> None:
+    def _update_components(self) -> None:
         """ Atualiza os componentes do player. """
         self.attack_component.update()
         self.movement_component.update(self.rect)
@@ -111,28 +124,14 @@ class Player(pygame.sprite.Sprite):
 
     @property
     def life(self) -> int:
-        """ Retorna o valor atual da vida do jogador.
-        @property define o método 'life' como uma propriedade somente leitura. 
-        Quando você acessa player.life, ele retorna o valor atual de self._life. """
+        """ Retorna o valor atual da vida do jogador. """
         return self._life
 
 
     @life.setter
     def life(self, value) -> None:
-        """ Define o valor da vida do jogador.
-
-        @life.setter permite definir o valor da vida do jogador quando você tenta atribuir um novo valor a player.life.
-
-        Nota:
-            self._life = max(0, value) garante que a vida do jogador não seja definida como um valor negativo.
-            Se value for menor que 0, self._life será definido como 0.
-        """
+        """ Define o valor da vida do jogador. """
         self._life = max(0, value)
-
-
-    def reduce_life(self, damage) -> None:
-        """ Método para reduzir a vida. """
-        self.life -= damage
 
 
     @property
@@ -145,9 +144,3 @@ class Player(pygame.sprite.Sprite):
     def attack_damage(self, value) -> None:
         """ Define o valor do dano de ataque do jogador. """
         self._attack_damage = max(0, value)
-
-
-    def reset(self) -> None:
-        """ Reseta a posição e vida do jogador. """
-        self.rect.center = self.INITIAL_POSITION
-        self._life = self.MAX_LIFE

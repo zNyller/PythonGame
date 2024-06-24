@@ -21,74 +21,89 @@ class Mob(pygame.sprite.Sprite):
     INITIAL_POSITION = (150, 520)
     MOVE_SPEED = 1.5
     ATTACK_RANGE = 65
-    XP_POINTS = 40
+    XP_POINTS = 20
 
 
-    def __init__(self, name, images, sounds, event_manager):
+    def __init__(self, name, images, sounds, event_manager) -> None:
         super().__init__()
         # Atributos gerais
         self.name = name
         self.images = images
         self.sounds = sounds
+        self.event_manager = event_manager
         self._life = self.MAX_LIFE
         self.strength = self.STRENGTH
         self.speed = self.MOVE_SPEED
         self.xp_points = self.XP_POINTS
-
         # Imagem e posição
         self.default_image = images["default"]
         self.attacking_image = images["attacking"]
         self.image = self.default_image
         self.rect = self.image.get_rect(center = self.INITIAL_POSITION) 
         self.mask = pygame.mask.from_surface(self.image)
-
-        self.event_manager = event_manager
-        # Barra de vida
-        self.life_bar_component = LifeBarComponent(self, event_manager, width=40, height=8, color=RED)
         # Atributos de combate
         self.attack_range = self.ATTACK_RANGE
-        self.attack_component = BasicAttackComponent(self, self.strength, 25, self.attack_range, sounds["hit_player"], 30, self.event_manager)
         self.receive_damage_sound = sounds["scream"]
         self.death_sound = sounds["blood_pop"]
+        # Components
+        self.attack_component = BasicAttackComponent(self, self.strength, 25, self.attack_range, sounds["hit_player"], self.event_manager)
+        self.life_bar_component = LifeBarComponent(self, event_manager, width=40, height=8, color=RED)
 
 
-    def reset(self):
-        """Reseta o mob para seu estado inicial padrão e emite o evento de reset."""
-
-        self._life = self.MAX_LIFE
-        self.rect.center = self.INITIAL_POSITION
-
-        event = {'type': 'mob_reset', 'target': self}
-        self.event_manager.notify(event)
-
-
-    def draw_life_bar(self, screen):
+    def draw_life_bar(self, screen) -> None:
         self.life_bar_component.draw_life_bar(screen)
 
 
-    def update(self, player_sprites):
+    def update(self) -> None:
         """ Atualiza a posição da barra de vida e verifica colisão com o player para mover. """
-
         self.life_bar_component.update_life_bar()
-        self.attack_component.update(player_sprites)
-        self._check_colision(player_sprites)
+        self.attack_component.update()
+        self._check_colision()
 
 
-    def defeat(self):
+    def receive_damage(self, damage) -> None:
+        """ Recebe a quantidade de dano e notifica os listeners. """
+        self.life -= damage
+        self.receive_damage_sound.play()
+        self.event_manager.notify({'type': 'damage_event', 'target': self, 'damage': damage})
+
+
+    def defeat(self) -> None:
         """ Efeito de morte e notifica os listeners. """
         self.death_sound.play()
         self.event_manager.notify({'type': 'mob_defeated', 'xp_points': self.xp_points})
 
 
-    def _check_colision(self, player_sprites):
-        hit_player = pygame.sprite.spritecollideany(self, player_sprites, pygame.sprite.collide_mask)
-        if not hit_player:
+    def reset(self) -> None:
+        """ Reseta o mob para seu estado inicial padrão e emite o evento de reset. """
+        self._life = self.MAX_LIFE
+        self.rect.center = self.INITIAL_POSITION
+        self.event_manager.notify({'type': 'mob_reset', 'target': self})
+
+
+    def _check_colision(self) -> None:
+        """ Verifica se houve colisão com o player e lida de acordo. """
+        if not self.has_collided():
             self._move()
         elif self.attack_component.state == 'idle':
             self.attack_component.attack()
 
 
-    def _move(self):
+    def has_collided(self) -> bool:
+        """ Verifica colisão com o jogador considerando uma margem. """
+        player_sprites = self.event_manager.notify({'type': 'get_player_sprites'})
+        if player_sprites:
+            for target in player_sprites:
+                margin = 15
+                player_hitbox = pygame.Rect(target.rect.x + margin, target.rect.y + margin,
+                                            target.rect.width + 2 * margin, target.rect.height + 2 * margin)
+                
+                if self.rect.colliderect(player_hitbox):
+                    return True
+        return False
+
+
+    def _move(self) -> None:
         """ Move o mob e limita o movimento dentro das bordas. """
         self.rect.x += self.speed
         if self.rect.left < LEFT_BOUNDARY or self.rect.right > RIGHT_BOUNDARY:
@@ -96,17 +111,12 @@ class Mob(pygame.sprite.Sprite):
 
 
     @property
-    def life(self):
+    def life(self) -> int:
+        """ Getter para o valor de life do mob. """
         return self._life
     
 
     @life.setter
-    def life(self, value):
+    def life(self, value) -> None:
+        """ Setter para o valor de life do mob. """
         self._life = max(0, value)
-
-
-    def receive_damage(self, damage):
-        """ Recebe a quantidade de dano e notifica os listeners. """
-        self.life -= damage
-        self.receive_damage_sound.play()
-        self.event_manager.notify({'type': 'damage_event', 'target': self, 'damage': damage})

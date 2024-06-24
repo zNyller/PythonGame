@@ -21,7 +21,7 @@ class StatsBarComponent:
         self.event_manager.subscribe('player_up', self)
 
 
-    def notify(self, event):
+    def notify(self, event) -> None:
         if event['type'] == 'player_up':
             self.max_experience *= 1.5
 
