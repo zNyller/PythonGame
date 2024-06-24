@@ -17,9 +17,9 @@ class Mob(pygame.sprite.Sprite):
     """
 
     MAX_LIFE = 50
-    STRENGTH = 15
+    STRENGTH = 0
     INITIAL_POSITION = (150, 520)
-    MOVE_SPEED = 1.5
+    MOVE_SPEED = 0.5
     ATTACK_RANGE = 65
     XP_POINTS = 20
 
@@ -94,7 +94,7 @@ class Mob(pygame.sprite.Sprite):
         player_sprites = self.event_manager.notify({'type': 'get_player_sprites'})
         if player_sprites:
             for target in player_sprites:
-                margin = 15
+                margin = 50
                 player_hitbox = pygame.Rect(target.rect.x + margin, target.rect.y + margin,
                                             target.rect.width + 2 * margin, target.rect.height + 2 * margin)
                 

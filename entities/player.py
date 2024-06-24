@@ -13,7 +13,7 @@ class Player(pygame.sprite.Sprite):
     INITIAL_POSITION = (600, 586)
     MAX_LIFE = 100
     MOVE_SPEED = 6
-    SWORD_DAMAGE = 50
+    SWORD_DAMAGE = 20
 
 
     def __init__(self, images, sounds, event_manager) -> None:
@@ -73,7 +73,9 @@ class Player(pygame.sprite.Sprite):
         """ Lida com os eventos do jogador, como ataques. """
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
-            self.attack_component.attack()
+            self.attack_component.attack(1)
+        if keys[pygame.K_LCTRL]:
+            self.attack_component.attack(2)
 
 
     def receive_damage(self, damage) -> None:
