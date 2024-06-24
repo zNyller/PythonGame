@@ -13,7 +13,7 @@ class Player(pygame.sprite.Sprite):
     INITIAL_POSITION = (600, 586)
     MAX_LIFE = 100
     MOVE_SPEED = 6
-    SWORD_DAMAGE = 40
+    SWORD_DAMAGE = 50
 
 
     def __init__(self, images, sounds, event_manager) -> None:

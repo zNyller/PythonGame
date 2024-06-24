@@ -4,8 +4,9 @@ from components.attack_component import AttackComponent
 class PlayerAttackComponent(AttackComponent):
     """ Classe para gerenciar o componente de ataque do player. """
 
-    ATTACK_DURATION = 44
-    ANIMATION_SPEED = 0.20
+    #ATTACK_DURATION = 44
+    ATTACK_DURATION = 95
+    ANIMATION_SPEED = 0.36
     STATE_IDLE = 'idle'
     STATE_ATTACKING = 'attacking'
 
@@ -60,6 +61,7 @@ class PlayerAttackComponent(AttackComponent):
             self.animation_counter = 0
             self.current_frame_index = (self.current_frame_index + 1) % len(self.player.cannon_frames)
             self._update_attack_hitbox()
+            print(f'frame: {self.current_frame_index}')
         self._update_player_image()
 
 
