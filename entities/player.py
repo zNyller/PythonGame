@@ -12,8 +12,9 @@ class Player(pygame.sprite.Sprite):
     INITIAL_STRENGTH = 1
     INITIAL_POSITION = (600, 586)
     MAX_LIFE = 100
-    MOVE_SPEED = 6
+    MOVE_SPEED = 4
     SWORD_DAMAGE = 20
+    SPECIAL_DAMAGE = 30
 
 
     def __init__(self, images, sounds, event_manager) -> None:
@@ -39,6 +40,7 @@ class Player(pygame.sprite.Sprite):
 
         # Atributos de combate
         self._attack_damage = self.SWORD_DAMAGE + self.strength
+        self.cannon_damage = self.SPECIAL_DAMAGE
         self.attack_sound = sounds["attacking"]
         self.receive_damage_sound = sounds["hit"]
         self.death_sound = sounds["game_over"]

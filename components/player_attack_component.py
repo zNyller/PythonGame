@@ -41,7 +41,7 @@ class PlayerAttackComponent(AttackComponent):
 
 
     def update(self) -> None:
-        """ Atualiza a posição do player e o estado de ataque. """
+        """ Atualiza o estado de ataque. """
         if self.state == self.STATE_ATTACKING:
             self._continue_attack()
 
@@ -58,7 +58,7 @@ class PlayerAttackComponent(AttackComponent):
 
 
     def _continue_attack(self) -> None:
-        """ Gerencia a animação de ataque. """
+        """ Verifica a duração da animação de ataque e lida de acordo. """
         if self.duration_timer > 0:
             self._attack_animation()
             self._perform_attack()
@@ -77,57 +77,71 @@ class PlayerAttackComponent(AttackComponent):
         self.frame_counter += self.animation_speed
         if self.frame_counter >= 1:
             self.frame_counter = 0
-            if self.attack_type == 1:
-                self.current_frame_index = (self.current_frame_index + 1) % len(self.player.attack_frames)
-            elif self.attack_type == 2:
-                self.current_frame_index = (self.current_frame_index + 1) % len(self.player.cannon_frames)
+            self._increment_frame_index()
             self._update_attack_hitbox()
         self._update_player_image()
 
 
+    def _increment_frame_index(self) -> None:
+        """ Incrementa o índice de frame de acordo com o tipo de ataque. """
+        frames = self.player.attack_frames if self.attack_type == 1 else self.player.cannon_frames
+        self.current_frame_index = (self.current_frame_index + 1) % len(frames)
+
+
     def _update_player_image(self) -> None:
         """ Atualiza a imagem do player com base no frame de ataque atual. """
-        if self.attack_type == 1:
-            self.player.image = self.player.attack_frames[self.current_frame_index]
-        elif self.attack_type == 2:
-            self.player.image = self.player.cannon_frames[self.current_frame_index]
-        self.player.rect = self.player.image.get_rect()
-        self.player.rect.centerx = self.initial_rect.centerx
-        self.player.rect.bottom = self.initial_rect.bottom + 6
+        self.player.image = self._get_current_frame()
+        self.player.rect = self.player.image.get_rect(centerx=self.initial_rect.centerx, bottom = self.initial_rect.bottom + 6)
+
+
+    def _get_current_frame(self) -> pygame.Surface:
+        """ Retorna o frame atual baseado no tipo de ataque. """
+        return self.player.attack_frames[self.current_frame_index] if self.attack_type == 1 else self.player.cannon_frames[self.current_frame_index]
 
 
     def _update_attack_hitbox(self) -> None:
         """ Atualiza a hitbox de ataque com base no frame atual. """
-        if self.attack_type == 1:
-            if self.current_frame_index < 3:
-                self.attack_hitbox.size = (50, 50)
-            elif 3 <= self.current_frame_index < 6:
-                self.attack_hitbox.size = (370, 250)
-            else:
-                self.attack_hitbox.size = (50, 50)
-        elif self.attack_type == 2:
-            if self.current_frame_index < 4:
-                self.attack_hitbox.size = (100, 150)
-            elif self.current_frame_index < 16:
-                self.attack_hitbox.size = (310, 150)
-            elif self.current_frame_index < 18:
-                self.attack_hitbox.size = (450, 150)
-            elif self.current_frame_index < 20:
-                self.attack_hitbox.size = (520, 150)
-            elif self.current_frame_index < 21:
-                self.attack_hitbox.size = (570, 150)
-            elif self.current_frame_index < 22:
-                self.attack_hitbox.size = (590, 150)
-            elif self.current_frame_index < 23:
-                self.attack_hitbox.size = (650, 150)
-            elif self.current_frame_index < 24:
-                self.attack_hitbox.size = (670, 150)
-            elif self.current_frame_index < 25:
-                self.attack_hitbox.size = (690, 150)
-            
+        self.attack_hitbox.size = self._get_attack_hitbox_size()
         self.attack_hitbox.centerx = self.player.rect.centerx
         self.attack_hitbox.bottom = self.player.rect.bottom
 
+
+    def _get_attack_hitbox_size(self) -> tuple:
+        """ Retorna o tamanho da hitbox de acordo com o tipo de ataque atual. """
+        return self._get_sword_hitbox_size() if self.attack_type == 1 else self._get_cannon_hitbox_size()
+            
+
+    def _get_sword_hitbox_size(self) -> tuple[int, int]:
+        """ Retorna o tamanho da hitbox baseado no frame atual. """
+        if 3 <= self.current_frame_index < 6:
+            return (370, 250)
+        else:
+            return (100, 150)
+        
+
+    def _get_cannon_hitbox_size(self) -> tuple[int, int]:
+        """ Retorna o tamanho da hitbox baseado no frame atual. """
+        if self.current_frame_index < 4:
+            return (100, 150)
+        elif self.current_frame_index < 16:
+            return (310, 150)
+        elif self.current_frame_index < 18:
+            return (450, 150)
+        elif self.current_frame_index < 20:
+            return (520, 150)
+        elif self.current_frame_index < 21:
+            return (570, 150)
+        elif self.current_frame_index < 22:
+            return (590, 150)
+        elif self.current_frame_index < 23:
+            return (650, 150)
+        elif self.current_frame_index < 24:
+            return (670, 150)
+        elif self.current_frame_index < 25:
+            return (690, 150)
+        else:
+            return (100, 150)
+        
 
     def _reset_to_idle(self) -> None:
         """ Reseta o estado de ataque e notifica os listeners. """
@@ -140,22 +154,29 @@ class PlayerAttackComponent(AttackComponent):
         self._reset_attack_hitbox()
 
 
+    def _reset_attack_hitbox(self) -> None:
+        """ Reseta a hitbox do ataque com base na posição do player. """
+        self.attack_hitbox = pygame.Rect(self.player.rect.centerx - 25, self.player.rect.bottom - 50, 50, 50)
+
+
     def _perform_attack(self) -> None:
         """ Verifica a colisão com alvos e inflige dano. """
         target_sprites = self.event_manager.notify({'type': 'get_mob_sprites'})
         for target in target_sprites:
-            if self.attack_type == 1:
-                if self.attack_hitbox.colliderect(target.rect) and target not in self.hit_targets:
-                    self._inflict_damage(target)
-                    self.hit_targets.add(target)
-            elif self.attack_type == 2:
-                if self.attack_hitbox.colliderect(target.rect):
-                    self._inflict_damage(target)
+            if self.attack_type == 1 and self._hit_target(target):
+                self._inflict_damage(target, self.player.attack_damage)
+                self.hit_targets.add(target)
+            elif self.attack_type == 2 and self._hit_target(target):
+                self._inflict_damage(target, self.player.cannon_damage)
 
 
-    def _inflict_damage(self, target) -> None:
+    def _hit_target(self, target) -> bool:
+        """ Verifica se o alvo foi atingido pelo ataque e retorna true ou false. """
+        return self.attack_hitbox.colliderect(target.rect) and target not in self.hit_targets
+
+
+    def _inflict_damage(self, target, damage: int) -> None:
         """ Inflige dano ao alvo e lida com os eventos relativos. """
-        damage = self.player.attack_damage
         target.receive_damage(damage)
         self._knockback_target(target)
         self._check_target_life(target)
@@ -174,8 +195,3 @@ class PlayerAttackComponent(AttackComponent):
         if target.life <= 0:
             target.defeat()
             target.kill()
-
-
-    def _reset_attack_hitbox(self) -> None:
-        """ Reseta a hitbox do ataque com base na posição do player. """
-        self.attack_hitbox = pygame.Rect(self.player.rect.centerx - 25, self.player.rect.bottom - 50, 50, 50)

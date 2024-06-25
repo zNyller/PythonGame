@@ -25,9 +25,8 @@ class Game:
         self.mob = self.mob_factory.create_mob("Demon")
 
 
-    def run(self):
-        """Loop principal do jogo."""
-
+    def run(self) -> None:
+        """ Loop principal do jogo. """
         running = True
         while running:
             running, new_mob = self.handle_events()
@@ -38,7 +37,7 @@ class Game:
         pygame.quit()
 
 
-    def handle_events(self):
+    def handle_events(self) -> bool:
         """Lida com os eventos do jogo e resposta de comandos.
         
         Returns:
@@ -54,12 +53,12 @@ class Game:
         return True, None
     
 
-    def update(self):
-        """Atualiza os elementos na tela."""
+    def update(self) -> None:
+        """ Atualiza os elementos na tela. """
         self.sprite_manager.update_all()
 
 
-    def draw(self):
+    def draw(self) -> None:
         """Desenha os elementos na tela."""
 
         self.screen_manager.draw_game(self.resource_manager)
