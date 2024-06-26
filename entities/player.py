@@ -8,9 +8,9 @@ class Player(pygame.sprite.Sprite):
     """ Uma classe para representar o jogador. """
 
     # Constants
-    ANIMATION_SPEED = 0.1
+    ANIMATION_SPEED = 0.15
     INITIAL_STRENGTH = 1
-    INITIAL_POSITION = (600, 586)
+    INITIAL_POSITION = (600, 515)
     MAX_LIFE = 100
     MOVE_SPEED = 8
     SWORD_DAMAGE = 20

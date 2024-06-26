@@ -9,6 +9,8 @@ class BasicAttackComponent(AttackComponent):
     a aplicação de dano aos alvos atingidos e a reprodução de sons de ataque.
     """
 
+    KNOCKBACK_DISTANCE = 90
+
     def __init__(self, entity, damage, attack_duration, attack_range, attack_sound, event_manager):
         self.entity = entity
         self.attack_damage = damage
@@ -47,14 +49,20 @@ class BasicAttackComponent(AttackComponent):
         target_sprites = self.event_manager.notify({'type': 'get_player_sprites'})
         for target in target_sprites:
             if self.entity.rect.colliderect(target.rect) and target not in self.hit_targets:
-                self.entity.image = self.entity.attacking_image
+                self._set_attacking_image()
                 self._inflict_damage(target)
                 self.hit_targets.add(target)
 
 
+    def _set_attacking_image(self):
+        if self.entity._direction == 1:
+            self.entity.image = self.entity.attacking_image
+        else:
+            self.entity.image = pygame.transform.flip(self.entity.attacking_image, True, False)
+
+
     def _inflict_damage(self, target):
         """ Inflige dano ao alvo e lida com os eventos relativos. """
-
         target.receive_damage(self.attack_damage)
         self._knock_back_target(target)
         self._check_target_life(target)
@@ -62,10 +70,10 @@ class BasicAttackComponent(AttackComponent):
 
     def _knock_back_target(self, target):
         """ Calcula a direção do recuo com base nas posições do atacante e do alvo. """
-        if target.rect.centerx >= self.entity.rect.centerx:
-            self.entity.rect.centerx -= 90
+        if target.rect.centerx <= self.entity.rect.centerx:
+            self.entity.rect.centerx += self.KNOCKBACK_DISTANCE
         else:
-            self.entity.rect.centerx += 90
+            self.entity.rect.centerx -= self.KNOCKBACK_DISTANCE
 
 
     def _check_target_life(self, target):

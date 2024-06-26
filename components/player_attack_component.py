@@ -4,10 +4,10 @@ from components.attack_component import AttackComponent
 class PlayerAttackComponent(AttackComponent):
     """ Classe para gerenciar o componente de ataque do player. """
 
-    ATTACK_DURATION = 60
-    ANIMATION_SPEED = 0.15
-    CANNON_ATTACK_DURATION = 130
-    CANNON_ANIMATION_SPEED = 0.3
+    ATTACK_DURATION = 45
+    ANIMATION_SPEED = 0.2
+    CANNON_ATTACK_DURATION = 100
+    CANNON_ANIMATION_SPEED = 0.35
     STATE_IDLE = 'idle'
     STATE_ATTACKING = 'attacking'
     KNOCKBACK_DISTANCE = 90
@@ -89,7 +89,7 @@ class PlayerAttackComponent(AttackComponent):
         self.player.image = self._get_current_frame()
         if self.player.movement_component.facing_right:
             self.player.image = pygame.transform.flip(self.player.image, True, False)
-        self.player.rect = self.player.image.get_rect(centerx=self.initial_rect.centerx, bottom = self.initial_rect.bottom + 6)
+        self.player.rect = self.player.image.get_rect(centerx=self.player.rect.centerx, bottom = self.initial_rect.bottom + 6)
 
 
     def _get_current_frame(self) -> pygame.Surface:
@@ -122,7 +122,7 @@ class PlayerAttackComponent(AttackComponent):
     def _get_sword_hitbox_size(self) -> tuple[int, int]:
         """ Retorna o tamanho da hitbox baseado no frame atual. """
         if 3 <= self.current_frame_index < 6:
-            return (370, 250)
+            return (310, 250)
         else:
             return (100, 150)
         
@@ -132,7 +132,7 @@ class PlayerAttackComponent(AttackComponent):
         if self.current_frame_index < 4:
             return (100, 150)
         elif self.current_frame_index < 16:
-            return (310, 150)
+            return (250, 150)
         elif self.current_frame_index < 18:
             return (450, 150)
         elif self.current_frame_index < 20:
@@ -193,8 +193,10 @@ class PlayerAttackComponent(AttackComponent):
     def _knockback_target(self, target) -> None:
         """ Aplica efeito de recuo no alvo com base na posição do player. """
         if self.player.rect.centerx <= target.rect.centerx:
+            print(f'Direita! Player: {self.player.rect.centerx} - Mob: {target.rect.centerx}')
             target.rect.centerx += self.KNOCKBACK_DISTANCE  # Move o alvo para a direita
         else:
+            print(f'Esquerda! Player: {self.player.rect.centerx} - Mob: {target.rect.centerx}')
             target.rect.centerx -= self.KNOCKBACK_DISTANCE  # Move o alvo para a esquerda
 
 

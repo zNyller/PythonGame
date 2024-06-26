@@ -18,8 +18,8 @@ class Mob(pygame.sprite.Sprite):
 
     MAX_LIFE = 50
     STRENGTH = 15
-    INITIAL_POSITION = (150, 520)
-    MOVE_SPEED = 1.5
+    INITIAL_POSITION = (1150, 480)
+    MOVE_SPEED = 3.5
     ATTACK_RANGE = 65
     XP_POINTS = 20
 
@@ -41,6 +41,7 @@ class Mob(pygame.sprite.Sprite):
         self.image = self.default_image
         self.rect = self.image.get_rect(center = self.INITIAL_POSITION) 
         self.mask = pygame.mask.from_surface(self.image)
+        self._direction = 1  # 1 for right, -1 for left
         # Atributos de combate
         self.attack_range = self.ATTACK_RANGE
         self.receive_damage_sound = sounds["scream"]
@@ -56,9 +57,13 @@ class Mob(pygame.sprite.Sprite):
 
     def update(self) -> None:
         """ Atualiza a posição da barra de vida e verifica colisão com o player para mover. """
+        previous_direction = self._direction
         self.life_bar_component.update_life_bar()
         self.attack_component.update()
         self._check_colision()
+        # Flip image if direction changed
+        if self._direction != previous_direction:
+            self.image = pygame.transform.flip(self.image, True, False)
 
 
     def receive_damage(self, damage) -> None:
@@ -97,15 +102,22 @@ class Mob(pygame.sprite.Sprite):
                 distance_threshold = 150  # Distância mínima para considerar colisão
                 if abs(self.rect.centerx - target.rect.centerx) <= distance_threshold:
                     print('colidiu!')
-                    print(f'player_x = {target.rect.x}')
-                    print(f'mob_x = {self.rect.x}')
+                    print(f'player_x = {target.rect.centerx} | mob_x = {self.rect.centerx} | abs = {abs(self.rect.centerx - target.rect.centerx)}')
                     return True
         return False
 
 
     def _move(self) -> None:
         """ Move o mob e limita o movimento dentro das bordas. """
-        self.rect.x += self.speed
+        player_sprites = self.event_manager.notify({'type': 'get_player_sprites'})
+        if player_sprites:
+            for player in player_sprites:
+                if self.rect.centerx <= player.rect.centerx:
+                    self._direction = 1
+                    self.rect.x += self.speed
+                else:
+                    self._direction = -1
+                    self.rect.x -= self.speed
         if self.rect.left < LEFT_BOUNDARY or self.rect.right > RIGHT_BOUNDARY:
             self.rect.center = self.INITIAL_POSITION
 

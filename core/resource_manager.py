@@ -14,10 +14,7 @@ class ResourceManager:
         """ Carrega imagens e sons necessários. """
 
         try:
-            self.images['background'] = pygame.image.load(f'{IMAGES_DIR}/background.png')
-            self.images['background_sized'] = pygame.image.load(f'{IMAGES_DIR}/background_sized.png')
-            self.images['camping'] = pygame.image.load(f'{IMAGES_DIR}/camping.jpg')
-            self.images['player'] = pygame.image.load(f'{IMAGES_DIR}/guts_size.png').convert_alpha()
+            self.images['background'] = pygame.image.load(f'{IMAGES_DIR}/background_2.png')
             self.images['player_attacking'] = pygame.image.load(f'{IMAGES_DIR}/attack_spritesheet.png').convert_alpha()
             self.images['player_spritesheet'] = pygame.image.load(f'{IMAGES_DIR}/player_spritesheet.png').convert_alpha()
             self.images['cannon_attack'] = pygame.image.load(f'{IMAGES_DIR}/cannon_spritesheet.png').convert_alpha()
