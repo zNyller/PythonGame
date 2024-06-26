@@ -85,5 +85,5 @@ class BasicAttackComponent(AttackComponent):
 
     def _reset_attack_state(self):
         """ Retorna a imagem da entidade à sua imagem padrão. """
-        self.entity.image = self.entity.default_image
+        self.entity.image = self.entity.default_frames
         self.state = 'idle'

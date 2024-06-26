@@ -193,10 +193,8 @@ class PlayerAttackComponent(AttackComponent):
     def _knockback_target(self, target) -> None:
         """ Aplica efeito de recuo no alvo com base na posição do player. """
         if self.player.rect.centerx <= target.rect.centerx:
-            print(f'Direita! Player: {self.player.rect.centerx} - Mob: {target.rect.centerx}')
             target.rect.centerx += self.KNOCKBACK_DISTANCE  # Move o alvo para a direita
         else:
-            print(f'Esquerda! Player: {self.player.rect.centerx} - Mob: {target.rect.centerx}')
             target.rect.centerx -= self.KNOCKBACK_DISTANCE  # Move o alvo para a esquerda
 
 

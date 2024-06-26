@@ -1,5 +1,5 @@
 import pygame
-from config.constants import WHITE
+from config.constants import WHITE, BLUE_LIFEBAR
 
 class LifeBarComponent:
     """
@@ -29,15 +29,16 @@ class LifeBarComponent:
 
     def create_life_bar(self, centerx, top, width, height):
         """ Cria e retorna a barra de vida utilizando as medidas apropriadas. """
-        return pygame.Rect(centerx - width // 2, top -5, width, height)
+        return pygame.Rect(centerx - width // 2, top -15, width, height)
 
 
     def draw_life_bar(self, screen, camera):
         """ Desenha a barra de vida e seu contorno na tela considerando a câmera. """
+        self._update_life_bar_position()
         outline_pos = camera.apply(self.outline)
         inner_pos = camera.apply(self.inner)
-        pygame.draw.rect(screen, self.color, inner_pos)
-        pygame.draw.rect(screen, WHITE, outline_pos, 2)
+        pygame.draw.rect(screen, self.color, inner_pos, border_radius=5)
+        pygame.draw.rect(screen, BLUE_LIFEBAR, outline_pos, width=2, border_radius=5)
 
 
     def update_life_bar(self):
@@ -55,7 +56,7 @@ class LifeBarComponent:
 
     def _update_life_bar_position(self) -> None:
         """ Atualiza a posição da barra de acordo com a posição da entidade. """
-        self.outline.centerx = self.entity_rect.centerx
+        self.outline.centerx = self.entity_rect.centerx 
         self.inner.centerx = self.entity_rect.centerx
-        self.outline.top = self.entity_rect.top -5
-        self.inner.top = self.entity_rect.top -5
+        self.outline.top = self.entity_rect.top -15
+        self.inner.top = self.entity_rect.top -15

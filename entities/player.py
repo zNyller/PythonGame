@@ -30,7 +30,7 @@ class Player(pygame.sprite.Sprite):
         self.xp = 0
 
         # Imagem e posição
-        self.animation_state = 'default' # Estado de animação inicial
+        self.animation_state = self.STATE_DEFAULT # Estado de animação inicial
         self.animation_frames = images['default'] # Conjunto de frames de animação
         self.attack_frames = images['attacking'] # Conjunto de frames de ataque
         self.cannon_frames = images['cannon']

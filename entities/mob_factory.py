@@ -21,9 +21,11 @@ class MobFactory:
         Adiciona o mob ao grupo de sprite em sprite_manager, e por fim o retona.
         """
 
-        # Carrega imagens e sons do ResourceManager
+        soul = self.resource_manager.get_image('soul_default')
+        #soul_sprites = [self.sprite_manager.get_sprite(soul_spritesheet, *coords) for coords in self.sprite_manager.soul_sprite_coords]
+
         images = {
-            'default': self.resource_manager.get_image('mob'),
+            'default': soul,
             'attacking': self.resource_manager.get_image('mob_attacking') 
         }
         sounds = {

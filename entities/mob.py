@@ -1,4 +1,5 @@
 import pygame
+import math
 from config.constants import LEFT_BOUNDARY, RIGHT_BOUNDARY, RED
 from components.life_bar_component import LifeBarComponent
 from components.basic_attack_component import BasicAttackComponent
@@ -19,9 +20,10 @@ class Mob(pygame.sprite.Sprite):
     MAX_LIFE = 50
     STRENGTH = 15
     INITIAL_POSITION = (1150, 480)
-    MOVE_SPEED = 3.5
+    MOVE_SPEED = 3
     ATTACK_RANGE = 65
     XP_POINTS = 20
+    ANIMATION_SPEED = 0.1
 
 
     def __init__(self, name, images, sounds, event_manager) -> None:
@@ -36,19 +38,27 @@ class Mob(pygame.sprite.Sprite):
         self.speed = self.MOVE_SPEED
         self.xp_points = self.XP_POINTS
         # Imagem e posição
-        self.default_image = images["default"]
+        self.animation_state = "default"
+        self.default_frames = images["default"]
         self.attacking_image = images["attacking"]
-        self.image = self.default_image
+        self.current_frame_index = 0
+        self.image = self.default_frames
         self.rect = self.image.get_rect(center = self.INITIAL_POSITION) 
         self.mask = pygame.mask.from_surface(self.image)
         self._direction = 1  # 1 for right, -1 for left
+        self.float_amplitude = 10  # Amplitude da flutuação
+        self.float_speed = 0.05  # Velocidade da flutuação
+        self.float_offset = 0  # Offset para a flutuação
         # Atributos de combate
         self.attack_range = self.ATTACK_RANGE
         self.receive_damage_sound = sounds["scream"]
         self.death_sound = sounds["blood_pop"]
         # Components
         self.attack_component = BasicAttackComponent(self, self.strength, 25, self.attack_range, sounds["hit_player"], self.event_manager)
-        self.life_bar_component = LifeBarComponent(self, event_manager, width=40, height=8, color=RED)
+        self.life_bar_component = LifeBarComponent(self, event_manager, width=60, height=8, color=RED)
+        # Tempo de animação
+        self.animation_speed = self.ANIMATION_SPEED
+        self.animation_counter = 0
 
 
     def draw_life_bar(self, screen, camera) -> None:
@@ -58,10 +68,10 @@ class Mob(pygame.sprite.Sprite):
     def update(self) -> None:
         """ Atualiza a posição da barra de vida e verifica colisão com o player para mover. """
         previous_direction = self._direction
-        self.life_bar_component.update_life_bar()
+        self._update_float()
         self.attack_component.update()
         self._check_colision()
-        # Flip image if direction changed
+        self.life_bar_component.update_life_bar()
         if self._direction != previous_direction:
             self.image = pygame.transform.flip(self.image, True, False)
 
@@ -86,6 +96,14 @@ class Mob(pygame.sprite.Sprite):
         self.event_manager.notify({'type': 'mob_reset', 'target': self})
 
 
+    def _update_float(self) -> None:
+        """ Atualiza a posição y do mob para criar um efeito de flutuação. """
+        self.float_offset += self.float_speed
+        float_y = self.INITIAL_POSITION[1] + self.float_amplitude * math.sin(self.float_offset)
+        self.rect.y = int(float_y)
+        self.life_bar_component.update_life_bar()
+
+
     def _check_colision(self) -> None:
         """ Verifica se houve colisão com o player e lida de acordo. """
         if not self.has_collided():
@@ -101,8 +119,6 @@ class Mob(pygame.sprite.Sprite):
             for target in player_sprites:
                 distance_threshold = 150  # Distância mínima para considerar colisão
                 if abs(self.rect.centerx - target.rect.centerx) <= distance_threshold:
-                    print('colidiu!')
-                    print(f'player_x = {target.rect.centerx} | mob_x = {self.rect.centerx} | abs = {abs(self.rect.centerx - target.rect.centerx)}')
                     return True
         return False
 
@@ -110,6 +126,7 @@ class Mob(pygame.sprite.Sprite):
     def _move(self) -> None:
         """ Move o mob e limita o movimento dentro das bordas. """
         player_sprites = self.event_manager.notify({'type': 'get_player_sprites'})
+        self.rect.y -= 25
         if player_sprites:
             for player in player_sprites:
                 if self.rect.centerx <= player.rect.centerx:
@@ -120,6 +137,8 @@ class Mob(pygame.sprite.Sprite):
                     self.rect.x -= self.speed
         if self.rect.left < LEFT_BOUNDARY or self.rect.right > RIGHT_BOUNDARY:
             self.rect.center = self.INITIAL_POSITION
+        if self.rect.y <= 400:
+            self.rect.y += 25
 
 
     @property
