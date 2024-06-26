@@ -14,6 +14,7 @@ class BasicMovementComponent(MovementComponent):
         self.movement_speed = movement_speed
         self.event_manager = event_manager
         self.state = 'idle'
+        self.facing_right = True
         self.subscribe_to_events()
 
 
@@ -36,8 +37,10 @@ class BasicMovementComponent(MovementComponent):
 
         if keys[pygame.K_a]:
             self.move_left()
+            self.facing_right = False
         if keys[pygame.K_d]:
             self.move_right()
+            self.facing_right = True
 
 
     def move_left(self):

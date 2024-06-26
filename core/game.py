@@ -8,60 +8,60 @@ from core.event_manager import EventManager
 from core.sprite_manager import SpriteManager
 from entities.player_factory import PlayerFactory
 from entities.mob_factory import MobFactory
+from core.camera import Camera
 
 class Game:
     """Classe principal do jogo."""
     
+    FPS = 60
+
     def __init__(self):
         pygame.init()
         self.screen_manager = ScreenManager()
         self.resource_manager = ResourceManager()
         self.event_manager = EventManager()
         self.sprite_manager = SpriteManager(self.resource_manager, self.event_manager)
-
         self.player_factory = PlayerFactory(self.event_manager, self.resource_manager, self.sprite_manager)
         self.mob_factory = MobFactory(self.event_manager, self.resource_manager, self.sprite_manager)
         self.player = self.player_factory.create_player()
         self.mob = self.mob_factory.create_mob("Demon")
+        # Tamanho do mapa (3072x768) e tamanho da tela (1024x768)
+        self.camera = Camera(self.screen_manager.screen.get_width(), self.screen_manager.screen.get_height(), 3072, 768)
 
 
     def run(self) -> None:
         """ Loop principal do jogo. """
         running = True
-        while running:
-            running, new_mob = self.handle_events()
-            if new_mob:
-                self.sprite_manager.add_mob(new_mob)
-            self.update()
-            self.draw()
-        pygame.quit()
+        try:
+            while running:
+                running = self.handle_events()
+                self.update()
+                self.draw()
+        except Exception as e:
+            print(f"Erro inesperado: {e}")
+        finally:
+            pygame.quit()
 
 
     def handle_events(self) -> bool:
-        """Lida com os eventos do jogo e resposta de comandos.
-        
-        Returns:
-            bool: Indica se o jogo deve continuar executando (True) ou se deve ser encerrado (False).
-        """
-
+        """ Lida com os eventos do jogo/resposta de comandos e determina se o loop deve continuar ou encerrar. """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                return False, None
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
-                new_mob = self.sprite_manager.reset_game()
-                return True, new_mob
-        return True, None
+                return False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    self.sprite_manager.reset_game()
+        return True
     
 
     def update(self) -> None:
-        """ Atualiza os elementos na tela. """
+        """Atualiza os elementos na tela."""
         self.sprite_manager.update_all()
-
+        self.camera.update(self.player)  # Atualiza a posição da câmera com base no jogador
 
     def draw(self) -> None:
-        """Desenha os elementos na tela."""
-
-        self.screen_manager.draw_game(self.resource_manager)
-        self.sprite_manager.draw_all(self.screen_manager.screen)
+        """Desenha os elementos e atualiza a tela."""
+        self.screen_manager.draw_game(self.resource_manager, self.camera)
+        self.sprite_manager.draw_all(self.screen_manager.screen, self.camera)
         pygame.display.flip()
-        self.screen_manager.clock.tick(60)
+        self.screen_manager.clock.tick(self.FPS)

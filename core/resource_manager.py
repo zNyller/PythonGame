@@ -15,6 +15,7 @@ class ResourceManager:
 
         try:
             self.images['background'] = pygame.image.load(f'{IMAGES_DIR}/background.png')
+            self.images['background_sized'] = pygame.image.load(f'{IMAGES_DIR}/background_sized.png')
             self.images['camping'] = pygame.image.load(f'{IMAGES_DIR}/camping.jpg')
             self.images['player'] = pygame.image.load(f'{IMAGES_DIR}/guts_size.png').convert_alpha()
             self.images['player_attacking'] = pygame.image.load(f'{IMAGES_DIR}/attack_spritesheet.png').convert_alpha()

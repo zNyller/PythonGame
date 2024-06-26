@@ -50,8 +50,8 @@ class Mob(pygame.sprite.Sprite):
         self.life_bar_component = LifeBarComponent(self, event_manager, width=40, height=8, color=RED)
 
 
-    def draw_life_bar(self, screen) -> None:
-        self.life_bar_component.draw_life_bar(screen)
+    def draw_life_bar(self, screen, camera) -> None:
+        self.life_bar_component.draw_life_bar(screen, camera)
 
 
     def update(self) -> None:
@@ -94,11 +94,11 @@ class Mob(pygame.sprite.Sprite):
         player_sprites = self.event_manager.notify({'type': 'get_player_sprites'})
         if player_sprites:
             for target in player_sprites:
-                margin = 40
-                player_hitbox = pygame.Rect(target.rect.x + margin, target.rect.y + margin,
-                                            target.rect.width + 2 * margin, target.rect.height + 2 * margin)
-                
-                if self.rect.colliderect(player_hitbox):
+                distance_threshold = 150  # Distância mínima para considerar colisão
+                if abs(self.rect.centerx - target.rect.centerx) <= distance_threshold:
+                    print('colidiu!')
+                    print(f'player_x = {target.rect.x}')
+                    print(f'mob_x = {self.rect.x}')
                     return True
         return False
 

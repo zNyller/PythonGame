@@ -8,13 +8,14 @@ class Player(pygame.sprite.Sprite):
     """ Uma classe para representar o jogador. """
 
     # Constants
-    ANIMATION_SPEED = 0.15
+    ANIMATION_SPEED = 0.1
     INITIAL_STRENGTH = 1
     INITIAL_POSITION = (600, 586)
     MAX_LIFE = 100
-    MOVE_SPEED = 4
+    MOVE_SPEED = 8
     SWORD_DAMAGE = 20
     SPECIAL_DAMAGE = 30
+    STATE_DEFAULT = 'default'
 
 
     def __init__(self, images, sounds, event_manager) -> None:
@@ -65,7 +66,6 @@ class Player(pygame.sprite.Sprite):
 
     def update(self) -> None:
         """ Atualiza o estado do jogador. """
-        
         self._update_animation()
         self.handle_events()
         self._update_components()
@@ -95,7 +95,7 @@ class Player(pygame.sprite.Sprite):
 
     def _update_animation(self) -> None:
         """ Atualiza a animação do sprite. """
-        if self.animation_state == 'default':
+        if self.animation_state == self.STATE_DEFAULT:
             self._increment_animation_counter()
             self._update_current_frame()
             self._update_image_and_mask()
@@ -116,6 +116,8 @@ class Player(pygame.sprite.Sprite):
     def _update_image_and_mask(self) -> None:
         """ Atualiza a imagem e a máscara do sprite. """
         self.image = self.animation_frames[self.current_frame_index]
+        if self.movement_component.facing_right:
+            self.image = pygame.transform.flip(self.image, True, False)
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(center=self.rect.center)
 

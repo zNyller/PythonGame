@@ -32,10 +32,12 @@ class LifeBarComponent:
         return pygame.Rect(centerx - width // 2, top -5, width, height)
 
 
-    def draw_life_bar(self, screen):
-        """ Desenha a barra de vida e seu contorno na tela. """
-        pygame.draw.rect(screen, self.color, self.inner)
-        pygame.draw.rect(screen, WHITE, self.outline, 2)
+    def draw_life_bar(self, screen, camera):
+        """ Desenha a barra de vida e seu contorno na tela considerando a câmera. """
+        outline_pos = camera.apply(self.outline)
+        inner_pos = camera.apply(self.inner)
+        pygame.draw.rect(screen, self.color, inner_pos)
+        pygame.draw.rect(screen, WHITE, outline_pos, 2)
 
 
     def update_life_bar(self):

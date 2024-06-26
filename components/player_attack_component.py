@@ -4,10 +4,10 @@ from components.attack_component import AttackComponent
 class PlayerAttackComponent(AttackComponent):
     """ Classe para gerenciar o componente de ataque do player. """
 
-    ATTACK_DURATION = 44
-    ANIMATION_SPEED = 0.20
-    CANNON_ATTACK_DURATION = 95
-    CANNON_ANIMATION_SPEED = 0.36
+    ATTACK_DURATION = 60
+    ANIMATION_SPEED = 0.15
+    CANNON_ATTACK_DURATION = 130
+    CANNON_ANIMATION_SPEED = 0.3
     STATE_IDLE = 'idle'
     STATE_ATTACKING = 'attacking'
     KNOCKBACK_DISTANCE = 90
@@ -69,10 +69,6 @@ class PlayerAttackComponent(AttackComponent):
 
     def _attack_animation(self) -> None:
         """ Avança os frames da animação de ataque. """
-        if self.frame_counter == 0 and self.current_frame_index == 0:
-            # Garantir a atualização inicial
-            self._update_player_image()
-            self._update_attack_hitbox()
 
         self.frame_counter += self.animation_speed
         if self.frame_counter >= 1:
@@ -91,6 +87,8 @@ class PlayerAttackComponent(AttackComponent):
     def _update_player_image(self) -> None:
         """ Atualiza a imagem do player com base no frame de ataque atual. """
         self.player.image = self._get_current_frame()
+        if self.player.movement_component.facing_right:
+            self.player.image = pygame.transform.flip(self.player.image, True, False)
         self.player.rect = self.player.image.get_rect(centerx=self.initial_rect.centerx, bottom = self.initial_rect.bottom + 6)
 
 
@@ -100,10 +98,20 @@ class PlayerAttackComponent(AttackComponent):
 
 
     def _update_attack_hitbox(self) -> None:
-        """ Atualiza a hitbox de ataque com base no frame atual. """
-        self.attack_hitbox.size = self._get_attack_hitbox_size()
-        self.attack_hitbox.centerx = self.player.rect.centerx
-        self.attack_hitbox.bottom = self.player.rect.bottom
+        """ Atualiza a hitbox de ataque com base no frame atual e na direção do jogador. """
+        attack_width, attack_height = self._get_attack_hitbox_size()
+        
+        offset_x = 0
+        offset_y = -20  # Exemplo: posicionar um pouco acima do centro do jogador
+        
+        if self.player.movement_component.facing_right:
+            offset_x += 20  # Exemplo: ajuste positivo para a direita
+        else:
+            offset_x -= 20  # Exemplo: ajuste negativo para a esquerda
+        
+        self.attack_hitbox.size = (attack_width, attack_height)
+        self.attack_hitbox.centerx = self.player.rect.centerx + offset_x
+        self.attack_hitbox.bottom = self.player.rect.bottom + offset_y
 
 
     def _get_attack_hitbox_size(self) -> tuple:
@@ -184,10 +192,10 @@ class PlayerAttackComponent(AttackComponent):
 
     def _knockback_target(self, target) -> None:
         """ Aplica efeito de recuo no alvo com base na posição do player. """
-        if target.rect.centerx <= self.player.rect.centerx:
-            target.rect.centerx -= self.KNOCKBACK_DISTANCE
+        if self.player.rect.centerx <= target.rect.centerx:
+            target.rect.centerx += self.KNOCKBACK_DISTANCE  # Move o alvo para a direita
         else:
-            target.rect.centerx += self.KNOCKBACK_DISTANCE
+            target.rect.centerx -= self.KNOCKBACK_DISTANCE  # Move o alvo para a esquerda
 
 
     def _check_target_life(self, target) -> None:

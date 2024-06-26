@@ -65,11 +65,9 @@ class SpriteManager:
         self.all_sprites = pygame.sprite.Group()
         self.player_sprites = pygame.sprite.Group()
         self.mob_sprites = pygame.sprite.Group()
-
         self.player_sprite_coords = self.PLAYER_SPRITE_COORDS
         self.attack_sprite_coords = self.ATTACK_SPRITE_COORDS
         self.cannon_attack_coords = self.CANNON_ATTACK_COORDS
-
         self.subscribe_to_events()
 
 
@@ -93,21 +91,18 @@ class SpriteManager:
 
     def update_all(self):
         """ Atualiza os sprites na tela. """
-
         self.player_sprites.update()
         self.mob_sprites.update()
 
 
-    def draw_all(self, screen):
-        """ Desenha os sprites e seus elementos na tela. """
-
+    def draw_all(self, screen, camera):
+        """Desenha os sprites e seus elementos na tela."""
         for entity in self.all_sprites:
+            screen.blit(entity.image, camera.apply(entity))
             if hasattr(entity, 'draw_stats_bar'):
                 entity.draw_stats_bar(screen)
-            else:
-                entity.draw_life_bar(screen)
-
-            screen.blit(entity.image, entity.rect)
+            elif hasattr(entity, 'draw_life_bar'):
+                entity.draw_life_bar(screen, camera)
 
 
     def get_sprite(self, spritesheet, x, y, width, height):
@@ -133,10 +128,11 @@ class SpriteManager:
     
 
     def reset_game(self):
-        """ Reseta o estado das entidades e retorna um novo mob. """
+        """ Reseta o estado das entidades e gera um novo mob. """
         self._reset_player()
         self._release_mob()
-        return self._get_new_mob()
+        new_mob = self._get_new_mob()
+        self.add_mob(new_mob)
     
 
     def _reset_player(self):
