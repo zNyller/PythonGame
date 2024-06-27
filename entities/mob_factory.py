@@ -26,7 +26,7 @@ class MobFactory:
 
         images = {
             'default': soul,
-            'attacking': self.resource_manager.get_image('mob_attacking') 
+            'attacking': self.resource_manager.get_image('soul_attacking') 
         }
         sounds = {
             'blood_pop': self.resource_manager.get_sound('blood_pop'),

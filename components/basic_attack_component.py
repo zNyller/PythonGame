@@ -18,8 +18,13 @@ class BasicAttackComponent(AttackComponent):
         self.attack_range = attack_range
         self.attack_sound = attack_sound
         self.state = 'idle'
-        self.hit_targets = set() # Armaneza alvos já atingidos durante o ataque atual
+        self.hit_target = False
         self.event_manager = event_manager
+        self.attack_start_position = None
+        self.attack_end_position = None
+        self.attack_progress = 0
+        self.attack_cooldown = 0
+        self.cooldown_duration = 30  # Tempo de cooldown em frames
 
 
     def attack(self):
@@ -28,10 +33,19 @@ class BasicAttackComponent(AttackComponent):
         Configura o estado de ataque e reproduz o som de ataque.
         """
 
-        if self.state == 'idle':
+        if self.state == 'idle' and self.attack_cooldown == 0:
             self.state = 'attacking'
-            self.hit_targets.clear() # Limpa alvos atingidos no ataque anterior
             self.attack_duration = self.initial_attack_duration # Reseta a duração do ataque
+            self.attack_cooldown = self.cooldown_duration
+
+            # Definir as posições inicial e final para o movimento
+            self.attack_start_position = self.entity.rect.centerx
+            if self.entity._direction == 1:
+                self.attack_end_position = self.entity.rect.centerx + self.attack_range
+            else:
+                self.attack_end_position = self.entity.rect.centerx - self.attack_range
+
+            self.attack_progress = 0
 
 
     def update(self):
@@ -39,19 +53,40 @@ class BasicAttackComponent(AttackComponent):
         if self.state == 'attacking':
             if self.attack_duration > 0:
                 self._perform_attack()
+                self._update_attack_movement()
                 self.attack_duration -= 1
             else:
                 self._reset_attack_state()
+        if self.attack_cooldown > 0:
+            self.attack_cooldown -= 1
 
 
     def _perform_attack(self):
         """ Verifica colisão com o jogador e inflige dano. """
         target_sprites = self.event_manager.notify({'type': 'get_player_sprites'})
         for target in target_sprites:
-            if self.entity.rect.colliderect(target.rect) and target not in self.hit_targets:
+            if self.entity.rect.colliderect(target.rect) and not self.hit_target:
+                print(f'hit_targets: {self.hit_target}')
                 self._set_attacking_image()
                 self._inflict_damage(target)
-                self.hit_targets.add(target)
+                self.hit_target = True
+                print(self.hit_target)
+                self._move_trough_target(target)
+
+
+    def _update_attack_movement(self):
+        """ Move a entidade gradualmente durante o ataque. """
+        if self.attack_start_position is not None and self.attack_end_position is not None:
+            # Incrementar o progresso do ataque
+            self.attack_progress += 1 / self.initial_attack_duration
+            new_x = self.attack_start_position + (self.attack_end_position - self.attack_start_position) * self.attack_progress
+            self.entity.rect.centerx = int(new_x)
+            if self.attack_progress >= 1:
+                # Verificar colisão com o alvo e se ainda estamos atacando
+                if self.state == 'attacking':
+                    self._perform_attack()
+                
+                self.hit_target = False
 
 
     def _set_attacking_image(self):
@@ -64,8 +99,17 @@ class BasicAttackComponent(AttackComponent):
     def _inflict_damage(self, target):
         """ Inflige dano ao alvo e lida com os eventos relativos. """
         target.receive_damage(self.attack_damage)
-        self._knock_back_target(target)
+        #self._knock_back_target(target)
         self._check_target_life(target)
+
+
+    def _move_trough_target(self, target):
+        """ Move a entidade para atravessar o alvo durante o ataque. """
+        move_distance = self.attack_range
+        if target.rect.centerx <= self.entity.rect.centerx:
+            self.entity.rect.centerx -= move_distance
+        else:
+            self.entity.rect.centerx += move_distance
 
 
     def _knock_back_target(self, target):

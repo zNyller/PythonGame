@@ -5,23 +5,13 @@ from components.life_bar_component import LifeBarComponent
 from components.basic_attack_component import BasicAttackComponent
 
 class Mob(pygame.sprite.Sprite):
-    """ Uma classe para representar os mobs do jogo.
-
-    Atributos:
-        life (int): Pontos de vida do mob
-        strength (int): Pontos de força do mob para ataque
-        image (Surface): Imagem do mob
-        rect (Rect): Retângulo de colisão do mob
-        mask (Mask): Máscara de colisão do mob
-        receive_damage_sound (Sound): Som de dano recebido pelo mob
-        death_sound (Sound): Som de morte do mob
-    """
+    """ Uma classe para gerenciar os mobs do jogo. """
 
     MAX_LIFE = 50
     STRENGTH = 15
     INITIAL_POSITION = (1150, 480)
     MOVE_SPEED = 3
-    ATTACK_RANGE = 65
+    ATTACK_RANGE = 365
     XP_POINTS = 20
     ANIMATION_SPEED = 0.1
 

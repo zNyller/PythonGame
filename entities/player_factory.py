@@ -33,6 +33,8 @@ class PlayerFactory:
         }
         sounds = {
             'attacking': self.resource_manager.get_sound('attack_sound'),
+            'attacking2': self.resource_manager.get_sound('attack_sound_2'),
+            'cannon' : self.resource_manager.get_sound('cannon_sound'),
             'game_over': self.resource_manager.get_sound('game_over'),
             'hit': self.resource_manager.get_sound('hit_player'),
             'jumping': self.resource_manager.get_sound('player_jump'),

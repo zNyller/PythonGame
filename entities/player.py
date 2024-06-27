@@ -10,7 +10,7 @@ class Player(pygame.sprite.Sprite):
     # Constants
     ANIMATION_SPEED = 0.15
     INITIAL_STRENGTH = 1
-    INITIAL_POSITION = (600, 515)
+    INITIAL_POSITION = (200, 515)
     MAX_LIFE = 100
     MOVE_SPEED = 8
     SWORD_DAMAGE = 20
@@ -43,12 +43,14 @@ class Player(pygame.sprite.Sprite):
         self._attack_damage = self.SWORD_DAMAGE + self.strength
         self.cannon_damage = self.SPECIAL_DAMAGE
         self.attack_sound = sounds["attacking"]
+        self.attack_sound_2 = sounds["attacking2"]
+        self.cannon_sound = sounds["cannon"]
         self.receive_damage_sound = sounds["hit"]
         self.death_sound = sounds["game_over"]
         self.up_sound = sounds["level_complete"]
 
         # Components
-        self.attack_component = PlayerAttackComponent(self, self.attack_sound, self.event_manager)
+        self.attack_component = PlayerAttackComponent(self, (self.attack_sound, self.attack_sound_2, self.cannon_sound), self.event_manager)
         self.stats_bar_component = StatsBarComponent(self, images['stats_interface'], images['life_bar'], images['xp_bar'], self.event_manager)
         self.movement_component = BasicMovementComponent(self.rect, self.speed, self.event_manager)
 

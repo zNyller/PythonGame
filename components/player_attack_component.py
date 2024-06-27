@@ -27,8 +27,9 @@ class PlayerAttackComponent(AttackComponent):
         self.duration_timer = 0
         self.attack_type = None
         self.initial_rect = player.rect.copy()
-        self.attack_hitbox = pygame.Rect(self.player.rect.centerx, self.player.rect.centery, 50, 50)
+        self.attack_hitbox = pygame.Rect(0, 0, 50, 50)
         self.hit_targets = set()
+        self.first_attack = True
 
 
     def attack(self, attack_type: int) -> None:
@@ -50,11 +51,16 @@ class PlayerAttackComponent(AttackComponent):
         if self.attack_type == 1:
             self.animation_speed = self.ANIMATION_SPEED
             self.duration_timer = self.attack_duration
-            self.sound.play()
+            if self.first_attack:
+                self.sound[0].play()
+                self.first_attack = False
+            else:
+                self.sound[1].play()
         elif self.attack_type == 2:
             self.animation_speed = self.CANNON_ANIMATION_SPEED
             self.duration_timer = self.cannon_attack_duration
-            # sound cannon
+            self.sound[2].play()
+            self.first_attack = True
 
 
     def _continue_attack(self) -> None:
@@ -69,7 +75,7 @@ class PlayerAttackComponent(AttackComponent):
 
     def _attack_animation(self) -> None:
         """ Avança os frames da animação de ataque. """
-
+        self._update_attack_hitbox()
         self.frame_counter += self.animation_speed
         if self.frame_counter >= 1:
             self.frame_counter = 0
