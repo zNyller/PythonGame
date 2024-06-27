@@ -23,31 +23,31 @@ class BasicMovementComponent(MovementComponent):
         self.event_manager.subscribe('player_attack', self)
 
 
-    def update(self, player_rect):
+    def update(self, player_rect, delta_time):
         """Atualiza os movimentos"""
         if self.state == 'idle':
-            self.handle_movements()
+            self.handle_movements(delta_time)
         if player_rect:
             self.sync_player_rect(player_rect)
         self.limits_movements(LEFT_BOUNDARY, RIGHT_BOUNDARY)
 
 
-    def handle_movements(self):
+    def handle_movements(self, delta_time):
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_a]:
-            self.move_left()
+            self.move_left(delta_time)
             self.facing_right = False
         if keys[pygame.K_d]:
-            self.move_right()
+            self.move_right(delta_time)
             self.facing_right = True
 
 
-    def move_left(self):
-        self.entity_rect.x -= self.movement_speed
+    def move_left(self, delta_time):
+        self.entity_rect.x -= self.movement_speed * delta_time
 
-    def move_right(self):
-        self.entity_rect.x += self.movement_speed
+    def move_right(self, delta_time):
+        self.entity_rect.x += self.movement_speed * delta_time
 
 
     def sync_player_rect(self, player_rect):

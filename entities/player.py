@@ -1,4 +1,5 @@
 import pygame
+from components.animation_component import AnimationComponent
 from components.player_attack_component import PlayerAttackComponent
 from components.basic_movement_component import BasicMovementComponent
 from components.stats_bar_component import StatsBarComponent
@@ -8,14 +9,13 @@ class Player(pygame.sprite.Sprite):
     """ Uma classe para representar o jogador. """
 
     # Constants
-    ANIMATION_SPEED = 0.15
-    INITIAL_STRENGTH = 1
-    INITIAL_POSITION = (200, 515)
     MAX_LIFE = 100
-    MOVE_SPEED = 8
+    INITIAL_POSITION = (200, 515)
+    INITIAL_STRENGTH = 1
+    ANIMATION_SPEED = 7
+    MOVE_SPEED = 360
     SWORD_DAMAGE = 20
     SPECIAL_DAMAGE = 30
-    STATE_DEFAULT = 'default'
 
 
     def __init__(self, images, sounds, event_manager) -> None:
@@ -30,12 +30,11 @@ class Player(pygame.sprite.Sprite):
         self.xp = 0
 
         # Imagem e posição
-        self.animation_state = self.STATE_DEFAULT # Estado de animação inicial
         self.animation_frames = images['default'] # Conjunto de frames de animação
         self.attack_frames = images['attacking'] # Conjunto de frames de ataque
         self.cannon_frames = images['cannon']
-        self.current_frame_index = 0 # Índice atual do frame de animação
-        self.image = self.animation_frames[self.current_frame_index]
+        self.animation_speed = self.ANIMATION_SPEED
+        self.image = self.animation_frames[0]
         self.rect = self.image.get_rect(center = self.INITIAL_POSITION) # Posição e tamanho do retângulo que envolverá a imagem do player
         self.mask = pygame.mask.from_surface(self.image) # Máscara de colisão a partir da imagem do player
 
@@ -53,12 +52,9 @@ class Player(pygame.sprite.Sprite):
         self.attack_component = PlayerAttackComponent(self, (self.attack_sound, self.attack_sound_2, self.cannon_sound), self.event_manager)
         self.stats_bar_component = StatsBarComponent(self, images['stats_interface'], images['life_bar'], images['xp_bar'], self.event_manager)
         self.movement_component = BasicMovementComponent(self.rect, self.speed, self.event_manager)
+        self.animation_component = AnimationComponent(self, self.animation_frames, self.animation_speed)
 
         self.level_manager = LevelManager(self, self.event_manager)
-
-        # Tempo de animação
-        self.animation_speed = self.ANIMATION_SPEED
-        self.animation_counter = 0
 
 
     def draw_stats_bar(self, screen) -> None:
@@ -66,14 +62,14 @@ class Player(pygame.sprite.Sprite):
         self.stats_bar_component.draw_stats_bar(screen)
 
 
-    def update(self) -> None:
+    def update(self, delta_time) -> None:
         """ Atualiza o estado do jogador. """
-        self._update_animation()
-        self.handle_events()
-        self._update_components()
+        self.animation_component.update(delta_time)
+        self.handle_events(delta_time)
+        self._update_components(delta_time)
 
 
-    def handle_events(self) -> None:
+    def handle_events(self, delta_time) -> None:
         """ Lida com os eventos do jogador, como ataques. """
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
@@ -95,39 +91,10 @@ class Player(pygame.sprite.Sprite):
         self._life = self.MAX_LIFE
 
 
-    def _update_animation(self) -> None:
-        """ Atualiza a animação do sprite. """
-        if self.animation_state == self.STATE_DEFAULT:
-            self._increment_animation_counter()
-            self._update_current_frame()
-            self._update_image_and_mask()
-
-
-    def _increment_animation_counter(self) -> None:
-        """ Incrementa o contador de animação. """
-        self.animation_counter += self.animation_speed
-        if self.animation_counter >= len(self.animation_frames):
-            self.animation_counter = 0
-
-
-    def _update_current_frame(self) -> None:
-        """ Atualiza o frame atual da animação. """
-        self.current_frame_index = int(self.animation_counter)
-
-
-    def _update_image_and_mask(self) -> None:
-        """ Atualiza a imagem e a máscara do sprite. """
-        self.image = self.animation_frames[self.current_frame_index]
-        if self.movement_component.facing_right:
-            self.image = pygame.transform.flip(self.image, True, False)
-        self.mask = pygame.mask.from_surface(self.image)
-        self.rect = self.image.get_rect(center=self.rect.center)
-
-
-    def _update_components(self) -> None:
+    def _update_components(self, delta_time) -> None:
         """ Atualiza os componentes do player. """
         self.attack_component.update()
-        self.movement_component.update(self.rect)
+        self.movement_component.update(self.rect, delta_time)
 
 
     @property

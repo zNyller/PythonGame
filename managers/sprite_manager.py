@@ -10,14 +10,6 @@ class SpriteManager:
         (300, 164, 290, 150),# Sprite 4 (2ª linha, 2ª coluna)
         (5, 324, 290, 148),  # Sprite 5 (3ª linha, 1ª coluna)
     ]
-    # SOUL_SPRITE_COORDS = [
-    #     (3, 2, 129, 95),
-    #     (144, 2, 129, 95),
-    #     (286, 4, 129, 95),
-    #     (4, 109, 129, 95),
-    #     (145, 109, 129, 95),
-    #     (286, 106, 129, 95)
-    # ]
     ATTACK_SPRITE_COORDS = [
         (272, 70, 270, 150), # [1/1] 
         (830, 40, 270, 180), # [2/1] 
@@ -95,9 +87,9 @@ class SpriteManager:
         self.all_sprites.add(mob)
     
 
-    def update_all(self):
+    def update_all(self, delta_time):
         """ Atualiza os sprites na tela. """
-        self.player_sprites.update()
+        self.player_sprites.update(delta_time)
         self.mob_sprites.update()
 
 
