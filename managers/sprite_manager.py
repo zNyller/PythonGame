@@ -90,7 +90,7 @@ class SpriteManager:
     def update_all(self, delta_time):
         """ Atualiza os sprites na tela. """
         self.player_sprites.update(delta_time)
-        self.mob_sprites.update()
+        self.mob_sprites.update(delta_time)
 
 
     def draw_all(self, screen, camera):

@@ -10,7 +10,7 @@ class Mob(pygame.sprite.Sprite):
     MAX_LIFE = 50
     STRENGTH = 15
     INITIAL_POSITION = (1150, 480)
-    MOVE_SPEED = 3
+    MOVE_SPEED = 140
     ATTACK_RANGE = 365
     XP_POINTS = 20
     ANIMATION_SPEED = 0.1
@@ -37,7 +37,7 @@ class Mob(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
         self._direction = 1  # 1 for right, -1 for left
         self.float_amplitude = 10  # Amplitude da flutuação
-        self.float_speed = 0.05  # Velocidade da flutuação
+        self.float_speed = 6 # Velocidade da flutuação
         self.float_offset = 0  # Offset para a flutuação
         # Atributos de combate
         self.attack_range = self.ATTACK_RANGE
@@ -55,12 +55,12 @@ class Mob(pygame.sprite.Sprite):
         self.life_bar_component.draw_life_bar(screen, camera)
 
 
-    def update(self) -> None:
+    def update(self, delta_time) -> None:
         """ Atualiza a posição da barra de vida e verifica colisão com o player para mover. """
         previous_direction = self._direction
-        self._update_float()
+        self._update_float(delta_time)
         self.attack_component.update()
-        self._check_colision()
+        self._check_colision(delta_time)
         self.life_bar_component.update_life_bar()
         if self._direction != previous_direction:
             self.image = pygame.transform.flip(self.image, True, False)
@@ -86,18 +86,18 @@ class Mob(pygame.sprite.Sprite):
         self.event_manager.notify({'type': 'mob_reset', 'target': self})
 
 
-    def _update_float(self) -> None:
+    def _update_float(self, delta_time) -> None:
         """ Atualiza a posição y do mob para criar um efeito de flutuação. """
-        self.float_offset += self.float_speed
+        self.float_offset += self.float_speed * delta_time
         float_y = self.INITIAL_POSITION[1] + self.float_amplitude * math.sin(self.float_offset)
         self.rect.y = int(float_y)
         self.life_bar_component.update_life_bar()
 
 
-    def _check_colision(self) -> None:
+    def _check_colision(self, delta_time) -> None:
         """ Verifica se houve colisão com o player e lida de acordo. """
         if not self.has_collided():
-            self._move()
+            self._move(delta_time)
         elif self.attack_component.state == 'idle':
             self.attack_component.attack()
 
@@ -113,7 +113,7 @@ class Mob(pygame.sprite.Sprite):
         return False
 
 
-    def _move(self) -> None:
+    def _move(self, delta_time) -> None:
         """ Move o mob e limita o movimento dentro das bordas. """
         player_sprites = self.event_manager.notify({'type': 'get_player_sprites'})
         self.rect.y -= 25
@@ -121,10 +121,10 @@ class Mob(pygame.sprite.Sprite):
             for player in player_sprites:
                 if self.rect.centerx <= player.rect.centerx:
                     self._direction = 1
-                    self.rect.x += self.speed
+                    self.rect.x += self.speed * delta_time
                 else:
                     self._direction = -1
-                    self.rect.x -= self.speed
+                    self.rect.x -= self.speed * delta_time
         if self.rect.left < LEFT_BOUNDARY or self.rect.right > RIGHT_BOUNDARY:
             self.rect.center = self.INITIAL_POSITION
         if self.rect.y <= 400:

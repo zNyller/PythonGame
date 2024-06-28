@@ -4,18 +4,18 @@ from components.attack_component import AttackComponent
 class PlayerAttackComponent(AttackComponent):
     """ Classe para gerenciar o componente de ataque do player. """
 
-    ATTACK_DURATION = 45
-    ANIMATION_SPEED = 0.2
-    CANNON_ATTACK_DURATION = 100
-    CANNON_ANIMATION_SPEED = 0.35
+    ATTACK_DURATION = 1.1
+    ANIMATION_SPEED = 9
+    CANNON_ATTACK_DURATION = 2.5
+    CANNON_ANIMATION_SPEED = 15.5
     STATE_IDLE = 'idle'
     STATE_ATTACKING = 'attacking'
     KNOCKBACK_DISTANCE = 90
 
-    def __init__(self, player, sound, event_manager) -> None:
+    def __init__(self, player, sounds, event_manager) -> None:
         super().__init__()
         self.player = player
-        self.sound = sound
+        self.sounds = sounds
         self.event_manager = event_manager
         self.state = self.STATE_IDLE
         self.attack_duration = self.ATTACK_DURATION
@@ -41,10 +41,11 @@ class PlayerAttackComponent(AttackComponent):
             self._start_attack()
 
 
-    def update(self) -> None:
+    def update(self, delta_time) -> None:
         """ Atualiza o estado de ataque. """
         if self.state == self.STATE_ATTACKING:
-            self._continue_attack()
+            self._continue_attack(delta_time)
+            print(f'delta_time: {delta_time}')
 
 
     def _start_attack(self) -> None:
@@ -52,31 +53,31 @@ class PlayerAttackComponent(AttackComponent):
             self.animation_speed = self.ANIMATION_SPEED
             self.duration_timer = self.attack_duration
             if self.first_attack:
-                self.sound[0].play()
+                #self.sounds.get('attack_sound').play()
                 self.first_attack = False
             else:
-                self.sound[1].play()
+                #self.sounds.get('attack_sound_2').play()
+                self.first_attack = True
         elif self.attack_type == 2:
             self.animation_speed = self.CANNON_ANIMATION_SPEED
             self.duration_timer = self.cannon_attack_duration
-            self.sound[2].play()
-            self.first_attack = True
+            #self.sounds.get('cannon_sound').play()
 
 
-    def _continue_attack(self) -> None:
+    def _continue_attack(self, delta_time) -> None:
         """ Verifica a duração da animação de ataque e lida de acordo. """
         if self.duration_timer > 0:
-            self._attack_animation()
+            self._attack_animation(delta_time)
             self._perform_attack()
-            self.duration_timer -= 1
+            self.duration_timer -= delta_time
         else:
             self._reset_to_idle()
 
 
-    def _attack_animation(self) -> None:
+    def _attack_animation(self, delta_time) -> None:
         """ Avança os frames da animação de ataque. """
         self._update_attack_hitbox()
-        self.frame_counter += self.animation_speed
+        self.frame_counter += self.animation_speed * delta_time
         if self.frame_counter >= 1:
             self.frame_counter = 0
             self._increment_frame_index()
@@ -87,7 +88,10 @@ class PlayerAttackComponent(AttackComponent):
     def _increment_frame_index(self) -> None:
         """ Incrementa o índice de frame de acordo com o tipo de ataque. """
         frames = self.player.attack_frames if self.attack_type == 1 else self.player.cannon_frames
-        self.current_frame_index = (self.current_frame_index + 1) % len(frames)
+        self.current_frame_index += 1
+        if self.current_frame_index >= len(frames):
+            self.current_frame_index = 0
+        print(f'frame: {self.current_frame_index}')
 
 
     def _update_player_image(self) -> None:
@@ -106,18 +110,10 @@ class PlayerAttackComponent(AttackComponent):
     def _update_attack_hitbox(self) -> None:
         """ Atualiza a hitbox de ataque com base no frame atual e na direção do jogador. """
         attack_width, attack_height = self._get_attack_hitbox_size()
-        
-        offset_x = 0
-        offset_y = -20  # Exemplo: posicionar um pouco acima do centro do jogador
-        
-        if self.player.movement_component.facing_right:
-            offset_x += 20  # Exemplo: ajuste positivo para a direita
-        else:
-            offset_x -= 20  # Exemplo: ajuste negativo para a esquerda
-        
+        offset_x = 20 if self.player.movement_component.facing_right else -20
+
         self.attack_hitbox.size = (attack_width, attack_height)
         self.attack_hitbox.centerx = self.player.rect.centerx + offset_x
-        self.attack_hitbox.bottom = self.player.rect.bottom + offset_y
 
 
     def _get_attack_hitbox_size(self) -> tuple:

@@ -1,5 +1,6 @@
 # Imports
 import pygame
+import traceback
 
 # Imports internos
 from managers.screen_manager import ScreenManager
@@ -11,7 +12,7 @@ from entities.player_factory import PlayerFactory
 from entities.mob_factory import MobFactory
 
 class Game:
-    """ Classe principal do jogo. """
+    """ Classe principal do jogo. Coordena a inicialização, atualização e renderização dos elementos do jogo"""
     
     FPS = 60
     MAP_WIDTH = 3072
@@ -35,14 +36,23 @@ class Game:
         self.running = True
         try:
             while self.running:
-                delta_time = self.screen_manager.clock.tick(self.FPS) / 1000.0
+                new_delta_time = self.screen_manager.clock.tick(self.FPS) / 1000.0
+                self.delta_time = self._filter_delta_time(new_delta_time)
                 self._handle_events()
-                self._update(delta_time)
+                self._update(self.delta_time)
                 self._draw()
         except Exception as e:
-            print(f"Erro inesperado: {e}")
+            self._handle_exception(e)
         finally:
             pygame.quit()
+
+
+    def _filter_delta_time(self, new_delta_time: float):
+        """ Filtra valores variáveis de delta_time. """
+        fixed_delta_time = 0.016
+        if new_delta_time != fixed_delta_time:
+            return fixed_delta_time
+        return new_delta_time
 
 
     def _handle_events(self) -> None:
@@ -67,6 +77,21 @@ class Game:
 
     def _draw(self) -> None:
         """ Desenha os elementos do jogo e atualiza a tela. """
-        self.screen_manager.draw_game(self.resource_manager, self.camera)
+        self.screen_manager.draw_window(self.resource_manager, self.camera)
         self.sprite_manager.draw_all(self.screen_manager.screen, self.camera)
         pygame.display.flip()
+
+
+    def _handle_exception(e):
+        """Trata diferentes tipos de exceções e fornece logs detalhados."""
+        if isinstance(e, pygame.error):
+            print(f"Erro do Pygame: {e}")
+        elif isinstance(e, FileNotFoundError):
+            print(f"Arquivo não encontrado: {e}")
+        elif isinstance(e, AttributeError):
+            print(f"Erro de Atributo: {e}")
+        else:
+            print(f"Erro inesperado: {e}")
+        
+        # Imprime a pilha de chamadas completa para depuração
+        traceback.print_exc()

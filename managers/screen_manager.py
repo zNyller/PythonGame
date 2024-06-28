@@ -9,8 +9,8 @@ class ScreenManager:
         self.clock = pygame.time.Clock()
 
 
-    def draw_game(self, resource_manager, camera):
-        """ Desenha a janela e a imagem de fundo com efeito contínuo. """
+    def draw_window(self, resource_manager, camera):
+        """ Desenha a janela e a imagem de fundo. """
         self.screen.fill(BLACK)
         background = resource_manager.get_image('background')
         self.screen.blit(background, (camera.camera.x, camera.camera.y))

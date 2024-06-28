@@ -12,7 +12,6 @@ class Player(pygame.sprite.Sprite):
     MAX_LIFE = 100
     INITIAL_POSITION = (200, 515)
     INITIAL_STRENGTH = 1
-    ANIMATION_SPEED = 7
     MOVE_SPEED = 360
     SWORD_DAMAGE = 20
     SPECIAL_DAMAGE = 30
@@ -30,11 +29,10 @@ class Player(pygame.sprite.Sprite):
         self.xp = 0
 
         # Imagem e posição
-        self.animation_frames = images['default'] # Conjunto de frames de animação
+        self.idle_frames = images['default'] # Conjunto de frames de animação
         self.attack_frames = images['attacking'] # Conjunto de frames de ataque
         self.cannon_frames = images['cannon']
-        self.animation_speed = self.ANIMATION_SPEED
-        self.image = self.animation_frames[0]
+        self.image = self.idle_frames[0]
         self.rect = self.image.get_rect(center = self.INITIAL_POSITION) # Posição e tamanho do retângulo que envolverá a imagem do player
         self.mask = pygame.mask.from_surface(self.image) # Máscara de colisão a partir da imagem do player
 
@@ -49,11 +47,24 @@ class Player(pygame.sprite.Sprite):
         self.up_sound = sounds["level_complete"]
 
         # Components
-        self.attack_component = PlayerAttackComponent(self, (self.attack_sound, self.attack_sound_2, self.cannon_sound), self.event_manager)
-        self.stats_bar_component = StatsBarComponent(self, images['stats_interface'], images['life_bar'], images['xp_bar'], self.event_manager)
+        self.attack_component = PlayerAttackComponent(
+            player=self, 
+            sounds={'attack_sound': self.attack_sound, 'attack_sound_2': self.attack_sound_2, 'cannon_sound': self.cannon_sound}, 
+            event_manager=self.event_manager
+        )
+        self.stats_bar_component = StatsBarComponent(
+            player=self, 
+            interface=images['stats_interface'], 
+            life_bar=images['life_bar'],
+            xp_bar=images['xp_bar'], 
+            event_manager=self.event_manager
+        )
         self.movement_component = BasicMovementComponent(self.rect, self.speed, self.event_manager)
-        self.animation_component = AnimationComponent(self, self.animation_frames, self.animation_speed)
-
+        self.animation_component = AnimationComponent(
+            entity=self, 
+            animation_frames=self.idle_frames,
+            event_manager=self.event_manager
+        )
         self.level_manager = LevelManager(self, self.event_manager)
 
 
@@ -65,11 +76,11 @@ class Player(pygame.sprite.Sprite):
     def update(self, delta_time) -> None:
         """ Atualiza o estado do jogador. """
         self.animation_component.update(delta_time)
-        self.handle_events(delta_time)
+        self.handle_events()
         self._update_components(delta_time)
 
 
-    def handle_events(self, delta_time) -> None:
+    def handle_events(self) -> None:
         """ Lida com os eventos do jogador, como ataques. """
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
@@ -93,7 +104,7 @@ class Player(pygame.sprite.Sprite):
 
     def _update_components(self, delta_time) -> None:
         """ Atualiza os componentes do player. """
-        self.attack_component.update()
+        self.attack_component.update(delta_time)
         self.movement_component.update(self.rect, delta_time)
 
 

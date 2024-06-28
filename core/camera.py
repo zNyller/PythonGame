@@ -8,11 +8,13 @@ class Camera:
         self.map_width = map_width
         self.map_height = map_height
 
+
     def apply(self, entity):
         """ Aplica a câmera à entidade. """
         if hasattr(entity, 'rect'):
             return entity.rect.move(self.camera.topleft)
         return entity.move(self.camera.topleft)
+
 
     def update(self, target):
         """ Atualiza a posição da câmera com base no target. """
