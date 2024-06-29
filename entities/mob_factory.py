@@ -1,4 +1,5 @@
 from entities.mob import Mob
+from entities.troll import Troll
 from utils.object_pool import ObjectPool
 
 class MobFactory:
@@ -21,28 +22,51 @@ class MobFactory:
         Adiciona o mob ao grupo de sprite em sprite_manager, e por fim o retona.
         """
 
-        soul = self.resource_manager.get_image('soul_default')
-        #soul_sprites = [self.sprite_manager.get_sprite(soul_spritesheet, *coords) for coords in self.sprite_manager.soul_sprite_coords]
+        if name == 'Soul':
+            return self._create_soul()
+        elif name == 'Troll':
+            return self._create_troll()
+        
 
+    def _create_soul(self):
+        """ Cria uma Soul com configurações específicas. """
+        soul = self.resource_manager.get_image('soul_default')
         images = {
             'default': soul,
-            'attacking': self.resource_manager.get_image('soul_attacking') 
+            'attacking': self.resource_manager.get_image('soul_attacking'), 
         }
         sounds = {
             'blood_pop': self.resource_manager.get_sound('blood_pop'),
             'hit_player': self.resource_manager.get_sound('hit_player'),
             'scream': self.resource_manager.get_sound('mob_pain')
         }
-
-        mob = Mob(name, images, sounds, self.event_manager)
+        mob = Mob("Soul", images, sounds, self.event_manager)
         self.sprite_manager.add_mob(mob)
         return mob
     
 
+    def _create_troll(self):
+        """ Cria um Troll com configurações específicas. """
+        troll_spritesheet = self.resource_manager.get_image('troll_idle')
+        troll_sprites = [self.sprite_manager.get_sprite(troll_spritesheet, *coords) for coords in self.sprite_manager.troll_sprite_coords]
+        images = {'idle_frames': troll_sprites}
+        sounds = {
+            'blood_pop': self.resource_manager.get_sound('blood_pop'),
+            'hit_player': self.resource_manager.get_sound('hit_player'),
+            'scream': self.resource_manager.get_sound('mob_pain')
+        }
+
+        troll = Troll('Troll', images, sounds, self.event_manager)
+        self.sprite_manager.add_mob(troll)
+        return troll
+
+
     def get_mob(self, name):
         """Retorna um mob do pool, resetando-o para o estado inicial."""
         mob = self.mob_pool.get(name)
-        return mob
+        mob2 = self.mob_pool.get(name)
+        print(f'retornando {mob, mob2}')
+        return mob, mob2
     
 
     def release_mob(self, mob):

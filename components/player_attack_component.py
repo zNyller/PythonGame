@@ -45,7 +45,6 @@ class PlayerAttackComponent(AttackComponent):
         """ Atualiza o estado de ataque. """
         if self.state == self.STATE_ATTACKING:
             self._continue_attack(delta_time)
-            print(f'delta_time: {delta_time}')
 
 
     def _start_attack(self) -> None:
@@ -76,7 +75,6 @@ class PlayerAttackComponent(AttackComponent):
 
     def _attack_animation(self, delta_time) -> None:
         """ Avança os frames da animação de ataque. """
-        self._update_attack_hitbox()
         self.frame_counter += self.animation_speed * delta_time
         if self.frame_counter >= 1:
             self.frame_counter = 0
@@ -91,7 +89,6 @@ class PlayerAttackComponent(AttackComponent):
         self.current_frame_index += 1
         if self.current_frame_index >= len(frames):
             self.current_frame_index = 0
-        print(f'frame: {self.current_frame_index}')
 
 
     def _update_player_image(self) -> None:
@@ -114,6 +111,7 @@ class PlayerAttackComponent(AttackComponent):
 
         self.attack_hitbox.size = (attack_width, attack_height)
         self.attack_hitbox.centerx = self.player.rect.centerx + offset_x
+        self.attack_hitbox.bottom = self.player.rect.bottom + 6
 
 
     def _get_attack_hitbox_size(self) -> tuple:

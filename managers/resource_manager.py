@@ -14,15 +14,21 @@ class ResourceManager:
         """ Carrega imagens e sons necessários. """
 
         try:
-            self.images['background'] = pygame.image.load(f'{IMAGES_DIR}/background_2_sized.png')
+            self.images['background'] = pygame.image.load(f'{IMAGES_DIR}/background_2_sized.png').convert()
+            # Player
             self.images['player_attacking'] = pygame.image.load(f'{IMAGES_DIR}/attack_spritesheet.png').convert_alpha()
             self.images['player_spritesheet'] = pygame.image.load(f'{IMAGES_DIR}/player_spritesheet.png').convert_alpha()
             self.images['cannon_attack'] = pygame.image.load(f'{IMAGES_DIR}/cannon_spritesheet.png').convert_alpha()
-            self.images['soul_default'] = pygame.image.load(f'{IMAGES_DIR}/soul_1.png').convert_alpha()
-            self.images['soul_attacking'] = pygame.image.load(f'{IMAGES_DIR}/soul_attacking.png').convert_alpha()
             self.images['stats_interface'] = pygame.image.load(f'{IMAGES_DIR}/stats_interface.png').convert_alpha()
             self.images['life_bar'] = pygame.image.load(f'{IMAGES_DIR}/life_bar.png').convert_alpha()
             self.images['xp_bar'] = pygame.image.load(f'{IMAGES_DIR}/xp_bar.png').convert_alpha()
+            # Enemy
+            self.images['soul_default'] = pygame.image.load(f'{IMAGES_DIR}/soul_1.png').convert_alpha()
+            self.images['soul_attacking'] = pygame.image.load(f'{IMAGES_DIR}/soul_attacking.png').convert_alpha()
+            self.images['troll_idle'] = pygame.image.load(f'{IMAGES_DIR}/troll_idle.png').convert_alpha()
+            self.images['troll_damage'] = pygame.image.load(f'{IMAGES_DIR}/troll_damage.png').convert_alpha()
+            self.images['troll_death'] = pygame.image.load(f'{IMAGES_DIR}/troll_death.png').convert_alpha()
+            self.images['troll_spawn'] = pygame.image.load(f'{IMAGES_DIR}/troll_spawn.png').convert_alpha()
 
             #self.sounds['attack_sound'] = pygame.mixer.Sound(f'{SOUNDS_DIR}/attack_sound.wav')
             self.sounds['attack_sound'] = pygame.mixer.Sound(f'{SOUNDS_DIR}/zoio1.wav')

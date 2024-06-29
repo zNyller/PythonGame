@@ -34,7 +34,6 @@ class Player(pygame.sprite.Sprite):
         self.cannon_frames = images['cannon']
         self.image = self.idle_frames[0]
         self.rect = self.image.get_rect(center = self.INITIAL_POSITION) # Posição e tamanho do retângulo que envolverá a imagem do player
-        self.mask = pygame.mask.from_surface(self.image) # Máscara de colisão a partir da imagem do player
 
         # Atributos de combate
         self._attack_damage = self.SWORD_DAMAGE + self.strength

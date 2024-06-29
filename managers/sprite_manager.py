@@ -55,7 +55,17 @@ class SpriteManager:
         (1629, 3256, 675, 231), # [3/8]
         (2817, 3338, 297, 150), # [4/8]
     ]
-    
+    TROLL_SPRITE_COORDS = [
+        (0, 2, 150, 90),
+        (162, 0, 144, 90),
+        (2, 118, 142, 90),
+        (162, 116, 139, 92),
+        (2, 234, 142, 94),
+        (160, 232, 139, 96),
+        (0, 354, 140, 94),
+        (162, 356, 142, 92)
+    ]
+
     def __init__(self, resource_manager, event_manager):
         self.event_manager = event_manager
         self.resource_manager = resource_manager
@@ -66,6 +76,7 @@ class SpriteManager:
         self.player_sprite_coords = self.PLAYER_SPRITE_COORDS
         self.attack_sprite_coords = self.ATTACK_SPRITE_COORDS
         self.cannon_attack_coords = self.CANNON_ATTACK_COORDS
+        self.troll_sprite_coords = self.TROLL_SPRITE_COORDS
         self.subscribe_to_events()
 
 
@@ -129,8 +140,9 @@ class SpriteManager:
         """ Reseta o estado das entidades e gera um novo mob. """
         self._reset_player()
         self._release_mob()
-        new_mob = self._get_new_mob()
+        new_mob, new_mob2 = self._get_new_mobs()
         self.add_mob(new_mob)
+        self.add_mob(new_mob2)
     
 
     def _reset_player(self):
@@ -143,10 +155,11 @@ class SpriteManager:
 
     def _release_mob(self):
         for mob in self.mob_sprites:
+            print(f'mobs in mob_sprites: {mob}')
             self.event_manager.notify({'type': 'release_mob', 'mob': mob})
             mob.kill()
 
 
-    def _get_new_mob(self):
-        new_mob = self.event_manager.notify({'type': 'get_mob', 'name': 'New Demon'})
-        return new_mob
+    def _get_new_mobs(self):
+        new_mob, new_mob2 = self.event_manager.notify({'type': 'get_mob'})
+        return new_mob, new_mob2

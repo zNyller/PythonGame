@@ -17,6 +17,7 @@ class Game:
     FPS = 60
     MAP_WIDTH = 3072
     MAP_HEIGHT = 768
+    FIXED_DELTA_TIME = 0.016 # 60 FPS
 
     def __init__(self):
         pygame.init()
@@ -28,7 +29,9 @@ class Game:
         self.player_factory = PlayerFactory(self.event_manager, self.resource_manager, self.sprite_manager)
         self.mob_factory = MobFactory(self.event_manager, self.resource_manager, self.sprite_manager)
         self.player = self.player_factory.create_player()
-        self.mob = self.mob_factory.create_mob("Demon")
+        self.mob_factory.create_mob("Soul")
+        self.mob_factory.create_mob("Troll")
+        self.running = False
 
 
     def run(self) -> None:
@@ -36,10 +39,9 @@ class Game:
         self.running = True
         try:
             while self.running:
-                new_delta_time = self.screen_manager.clock.tick(self.FPS) / 1000.0
-                self.delta_time = self._filter_delta_time(new_delta_time)
+                self.screen_manager.clock.tick(self.FPS)
                 self._handle_events()
-                self._update(self.delta_time)
+                self._update(self.FIXED_DELTA_TIME)
                 self._draw()
         except Exception as e:
             self._handle_exception(e)
@@ -49,10 +51,7 @@ class Game:
 
     def _filter_delta_time(self, new_delta_time: float):
         """ Filtra valores variáveis de delta_time. """
-        fixed_delta_time = 0.016
-        if new_delta_time != fixed_delta_time:
-            return fixed_delta_time
-        return new_delta_time
+        return self.fixed_delta_time if new_delta_time != self.fixed_delta_time else new_delta_time
 
 
     def _handle_events(self) -> None:
@@ -82,7 +81,7 @@ class Game:
         pygame.display.flip()
 
 
-    def _handle_exception(e):
+    def _handle_exception(e, **kwargs):
         """Trata diferentes tipos de exceções e fornece logs detalhados."""
         if isinstance(e, pygame.error):
             print(f"Erro do Pygame: {e}")
