@@ -69,7 +69,6 @@ class SpriteManager:
     def __init__(self, resource_manager, event_manager):
         self.event_manager = event_manager
         self.resource_manager = resource_manager
-
         self.all_sprites = pygame.sprite.Group()
         self.player_sprites = pygame.sprite.Group()
         self.mob_sprites = pygame.sprite.Group()
@@ -77,17 +76,16 @@ class SpriteManager:
         self.attack_sprite_coords = self.ATTACK_SPRITE_COORDS
         self.cannon_attack_coords = self.CANNON_ATTACK_COORDS
         self.troll_sprite_coords = self.TROLL_SPRITE_COORDS
-        self.subscribe_to_events()
+        self._subscribe_to_events()
 
 
-    def subscribe_to_events(self):
+    def _subscribe_to_events(self):
         self.event_manager.subscribe('get_mob_sprites', self)
         self.event_manager.subscribe('get_player_sprites', self)
 
 
     def add_player(self, player):
         """ Adiciona aos grupos de sprites. """
-
         self.player_sprites.add(player)
         self.all_sprites.add(player)
 
@@ -139,11 +137,9 @@ class SpriteManager:
     def reset_game(self):
         """ Reseta o estado das entidades e gera um novo mob. """
         self._reset_player()
-        self._release_mob()
-        new_mob, new_mob2 = self._get_new_mobs()
-        self.add_mob(new_mob)
-        self.add_mob(new_mob2)
-    
+        self._release_mobs()
+        self._get_new_mobs()
+
 
     def _reset_player(self):
         if not self.player_sprites:
@@ -153,13 +149,14 @@ class SpriteManager:
                 player.reset()
 
 
-    def _release_mob(self):
+    def _release_mobs(self):
         for mob in self.mob_sprites:
-            print(f'mobs in mob_sprites: {mob}')
             self.event_manager.notify({'type': 'release_mob', 'mob': mob})
             mob.kill()
 
 
     def _get_new_mobs(self):
-        new_mob, new_mob2 = self.event_manager.notify({'type': 'get_mob'})
-        return new_mob, new_mob2
+        mob_types = ['Soul', 'Troll']
+        new_mobs = [self.event_manager.notify({'type': 'get_mob', 'name': mob}) for mob in mob_types]
+        for mob in new_mobs:
+            self.add_mob(mob)
