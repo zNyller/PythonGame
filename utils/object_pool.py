@@ -8,7 +8,10 @@ class ObjectPool:
 
 
     def get(self, *args, **kwargs) -> object:
-        """ Obtém um objeto do pool, se disponível, ou cria um novo usando a função de fábrica. """
+        """ 
+        Obtém um objeto resetado (caso contenha atributo 'reset') do pool, se disponível, 
+        ou cria um novo objeto usando a função de fábrica com base no 'name'. 
+        """
         if self.pool:
             obj = self.pool.pop()
             if hasattr(obj, 'reset'):

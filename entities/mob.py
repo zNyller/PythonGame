@@ -18,7 +18,7 @@ class Mob(pygame.sprite.Sprite):
     ANIMATION_SPEED = 0.1
 
 
-    def __init__(self, name, images, sounds, event_manager) -> None:
+    def __init__(self, name: str, images: dict, sounds: dict, event_manager) -> None:
         super().__init__()
         # Atributos gerais
         self.name = name
@@ -149,3 +149,8 @@ class Mob(pygame.sprite.Sprite):
     def life(self, value) -> None:
         """ Setter para o valor de life do mob. """
         self._life = max(0, value)
+
+
+    @property
+    def direction(self) -> int:
+        return self._direction
