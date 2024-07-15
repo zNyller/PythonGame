@@ -1,5 +1,5 @@
 import pygame
-from components.animation_component import AnimationComponent
+from components.basic_animation_component import BasicAnimationComponent
 from components.player_attack_component import PlayerAttackComponent
 from components.basic_movement_component import BasicMovementComponent
 from components.stats_bar_component import StatsBarComponent
@@ -20,21 +20,20 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, images: dict, sounds: dict, event_manager) -> None:
         """ Inicializa um novo jogador e configura seus atributos. """ 
         super().__init__()
-
+        # Atributos gerais
         self.name = 'Guts'
         self.event_manager = event_manager
         self._life = self.MAX_LIFE
         self.strength = self.INITIAL_STRENGTH
         self.speed = self.MOVE_SPEED
         self.xp = 0
-
         # Imagem e posição
+        self.images = images
         self.idle_frames = images['default']
         self.attack_frames = images['attacking']
         self.cannon_frames = images['cannon']
         self.image = self.idle_frames[0]
         self.rect = self.image.get_rect(center = self.INITIAL_POSITION)
-
         # Atributos de combate
         self._attack_damage = self.SWORD_DAMAGE + self.strength
         self.cannon_damage = self.SPECIAL_DAMAGE
@@ -44,35 +43,7 @@ class Player(pygame.sprite.Sprite):
         self.receive_damage_sound = sounds["hit"]
         self.death_sound = sounds["game_over"]
         self.up_sound = sounds["level_complete"]
-
-        # Components
-        self.attack_component = PlayerAttackComponent(
-            player=self, 
-            sounds={
-                'attack_sound': self.attack_sound, 
-                'attack_sound_2': self.attack_sound_2, 
-                'cannon_sound': self.cannon_sound
-            }, 
-            event_manager=self.event_manager
-        )
-        self.stats_bar_component = StatsBarComponent(
-            player=self, 
-            interface=images['stats_interface'], 
-            life_bar=images['life_bar'],
-            xp_bar=images['xp_bar'], 
-            event_manager=self.event_manager
-        )
-        self.movement_component = BasicMovementComponent(
-            entity_rect=self.rect, 
-            movement_speed=self.speed, 
-            event_manager=self.event_manager
-        )
-        self.animation_component = AnimationComponent(
-            entity=self, 
-            animation_frames=self.idle_frames,
-            event_manager=self.event_manager
-        )
-        self.level_manager = LevelManager(self, self.event_manager)
+        self._init_components()
 
 
     def draw_stats_bar(self, screen: pygame.Surface) -> None:
@@ -112,6 +83,37 @@ class Player(pygame.sprite.Sprite):
         """ Reseta a posição e vida do jogador. """
         self.rect.center = self.INITIAL_POSITION
         self._life = self.MAX_LIFE
+
+
+    def _init_components(self) -> None:
+        """ Inicializa os components utilizados pelo Player. """
+        self.attack_component = PlayerAttackComponent(
+            player=self, 
+            sounds={
+                'attack_sound': self.attack_sound, 
+                'attack_sound_2': self.attack_sound_2, 
+                'cannon_sound': self.cannon_sound
+            }, 
+            event_manager=self.event_manager
+        )
+        self.stats_bar_component = StatsBarComponent(
+            player=self, 
+            interface=self.images['stats_interface'], 
+            life_bar=self.images['life_bar'],
+            xp_bar=self.images['xp_bar'], 
+            event_manager=self.event_manager
+        )
+        self.movement_component = BasicMovementComponent(
+            entity_rect=self.rect, 
+            movement_speed=self.speed, 
+            event_manager=self.event_manager
+        )
+        self.animation_component = BasicAnimationComponent(
+            entity=self, 
+            animation_frames=self.idle_frames,
+            event_manager=self.event_manager
+        )
+        self.level_manager = LevelManager(self, self.event_manager)
 
 
     def _update_components(self, delta_time: float) -> None:

@@ -18,8 +18,7 @@ class BasicAttackComponent(AttackComponent):
         self.attack_sound = attack_sound
         self.event_manager = event_manager
         self.hit_target = False
-        self.attack_start_position = None
-        self.attack_end_position = None
+        self.attack_start_position = self.attack_end_position = None
         self.attack_progress = 0
         self.attack_cooldown = 0
         self.cooldown_duration = 30
@@ -31,6 +30,7 @@ class BasicAttackComponent(AttackComponent):
             self.state = self.ATTACK_STATE
             self.attack_duration = self.initial_attack_duration
             self.attack_cooldown = self.cooldown_duration
+            self._set_attack_position()
 
 
     def update(self):
@@ -41,7 +41,7 @@ class BasicAttackComponent(AttackComponent):
                 self._update_attack_movement()
                 self.attack_duration -= 1
             else:
-                self._reset_attack_state()
+                self._reset_attack()
         if self.attack_cooldown > 0:
             self.attack_cooldown -= 1
 
@@ -49,10 +49,10 @@ class BasicAttackComponent(AttackComponent):
     def _set_attack_position(self):
         """ Define a posição inicial e final para o movimento de ataque. """
         self.attack_start_position = self.entity.rect.centerx
-        if self.entity.direction == 1:
-            self.attack_end_position = self.entity.rect.centerx + self.attack_range
-        else:
-            self.attack_end_position = self.entity.rect.centerx - self.attack_range
+        direction_factor = 1 if self.entity.direction == 1 else -1
+        self.attack_end_position = (self.entity.rect.centerx + self.attack_range 
+                                    if direction_factor == 1 
+                                    else self.entity.rect.centerx - self.attack_range)
         self.attack_progress = 0
 
 
@@ -63,7 +63,7 @@ class BasicAttackComponent(AttackComponent):
             if self.entity.rect.colliderect(target.rect) and not self.hit_target:
                 self.hit_target = True
                 self._set_attacking_image()
-                self.inflict_damage(target)
+                self.inflict_damage(target, self.attack_damage)
                 self._move_trough_target(target)
 
 
@@ -75,14 +75,11 @@ class BasicAttackComponent(AttackComponent):
             new_x = int(self.attack_start_position + (self.attack_end_position - self.attack_start_position) * self.attack_progress)
             self.entity.rect.centerx = new_x
             self._check_attack_progress()
-
+            
 
     def _check_attack_progress(self):
         """ Verifica o progresso do ataque e marca hit_target como False para permitir um novo ataque. """
-        if self.attack_progress >= 1:
-            if self.state == self.ATTACK_STATE:
-                self._perform_attack()
-            self.hit_target = False
+        self.hit_target = False if self.attack_progress >= 1 else True
 
 
     def _set_attacking_image(self):

@@ -1,17 +1,19 @@
 import pygame
+from components.animation_component import AnimationComponent
 
-class AttackAnimation:
+class AttackAnimation(AnimationComponent):
 
     ATTACK_DURATION = 1.1
-    ANIMATION_SPEED = 9
+    ANIMATION_SPEED = 16 # 9
     CANNON_ATTACK_DURATION = 2.5
-    CANNON_ANIMATION_SPEED = 15.5
+    CANNON_ANIMATION_SPEED = 29 # 15.5
 
 
     def __init__(self, player) -> None:
+        super().__init__()
         self.player = player
         self._attack_type = None
-        self.frame_counter = self.current_frame_index = self.duration_timer = 0
+        self.duration_timer = 0
         self.initial_rect = player.rect.copy()
 
 
@@ -26,22 +28,26 @@ class AttackAnimation:
             self.duration_timer = self.CANNON_ATTACK_DURATION
 
 
-    def update_animation(self, delta_time) -> None:
+    def update(self, delta_time: float) -> None:
         """ Avança os frames da animação de ataque. """
         if self.duration_timer > 0:
-            print(f'frame: {self.current_frame_index}')
-            self.frame_counter += self.animation_speed * delta_time
-            if self.frame_counter >= 1:
-                self.frame_counter = 0
-                self._increment_frame_index()
-            self._update_player_image()
+            self._update_frame(delta_time)
             self.duration_timer -= delta_time
         else:
-            self.reset()  # Ensure the animation resets when the duration is over
+            self.reset()
+
+
+    def _update_frame(self, delta_time: float) -> None:
+        """ Atualiza o frame counter e a imagem do player. """
+        self.frame_counter += self.animation_speed * delta_time
+        if self.frame_counter >= 1:
+            self.frame_counter = -1
+            self._increment_frame_index()
+        self._update_player_image()
 
 
     def _increment_frame_index(self) -> None:
-        """ Incrementa o índice de frame de acordo com o tipo de ataque. """
+        """ Incrementa o índice de frame de acordo com o tipo de ataque e verifica se percorreu todos os frames. """
         frames = self.player.attack_frames if self.attack_type == 1 else self.player.cannon_frames
         self.current_frame_index += 1
         if self.current_frame_index >= len(frames):
@@ -69,4 +75,5 @@ class AttackAnimation:
     def reset(self) -> None:
         self.frame_counter = 0
         self.current_frame_index = 0
-        self.duration_timer = 0 
+        self.duration_timer = 0
+        self._attack_type = None

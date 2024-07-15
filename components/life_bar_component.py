@@ -1,23 +1,22 @@
 import pygame
-from config.constants import WHITE, BLUE_LIFEBAR
+from config.constants import BLUE_LIFEBAR
 
 class LifeBarComponent:
     """
-    Gerencia a posição e dimensões da barra de vida com base no status do jogador ou entidade.
+    Gerencia a posição e dimensões da barra de vida com base no status da entidade.
     Desenha a barra de vida na tela.
     """
     def __init__(self, entity, event_manager, width, height, color):
         self.entity = entity
+        self.event_manager = event_manager
         self.width = width
         self.height = height
         self.color = color
         self.max_life = entity.life
-        self.current_life = entity.life
+        self.current_life = self.previous_life = entity.life
         self.entity_rect = entity.rect
-        self.previous_life = entity.life
         self.outline = self.create_life_bar(self.entity_rect.centerx, self.entity_rect.top, self.width, self.height)
         self.inner = self.create_life_bar(self.entity_rect.centerx, self.entity_rect.top, self.width, self.height)
-        self.event_manager = event_manager
         self.event_manager.subscribe('damage_event', self)
 
 
@@ -50,7 +49,6 @@ class LifeBarComponent:
             self.previous_life = self.current_life
         else:
             self.inner.width = 0
-
         self._update_life_bar_position()
 
 

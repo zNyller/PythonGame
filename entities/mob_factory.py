@@ -1,4 +1,5 @@
 from entities.mob import Mob
+from entities.soul import Soul
 from entities.troll import Troll
 from utils.object_pool import ObjectPool
 
@@ -33,9 +34,8 @@ class MobFactory:
 
     def _create_soul(self) -> Mob:
         """ Cria uma Soul com configurações específicas. """
-        soul = self.resource_manager.get_image('soul_default')
         images = {
-            'default': soul,
+            'default': self.resource_manager.get_image('soul_default'),
             'attacking': self.resource_manager.get_image('soul_attacking'), 
         }
         sounds = {
@@ -43,16 +43,20 @@ class MobFactory:
             'hit_player': self.resource_manager.get_sound('hit_player'),
             'scream': self.resource_manager.get_sound('mob_pain')
         }
-        mob = Mob("Soul", images, sounds, self.event_manager)
-        self.sprite_manager.add_mob(mob)
-        return mob
+        soul = Soul("Soul", images, sounds, self.event_manager)
+        self.sprite_manager.add_mob(soul)
+        return soul
     
 
     def _create_troll(self) -> Mob:
         """ Cria um Troll com configurações específicas. """
         troll_spritesheet = self.resource_manager.get_image('troll_idle')
         troll_sprites = [self.sprite_manager.get_sprite(troll_spritesheet, *coords) for coords in self.sprite_manager.troll_sprite_coords]
-        images = {'idle_frames': troll_sprites}
+        images = {
+            'default': troll_sprites,
+            'attacking': troll_sprites,
+            'idle_frames': troll_sprites
+        }
         sounds = {
             'blood_pop': self.resource_manager.get_sound('blood_pop'),
             'hit_player': self.resource_manager.get_sound('hit_player'),

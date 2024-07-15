@@ -27,7 +27,7 @@ class PlayerAttackComponent(AttackComponent):
     def update(self, delta_time) -> None:
         """ Atualiza o estado de ataque. """
         if self.state == self.ATTACK_STATE:
-            self.attack_animation.update_animation(delta_time)
+            self.attack_animation.update(delta_time)
             self.attack_hitbox.update_hitbox(self.attack_animation.attack_type, 
                                              self.attack_animation.current_frame_index)
             self._perform_attack()
