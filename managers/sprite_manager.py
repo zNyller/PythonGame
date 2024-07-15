@@ -85,7 +85,7 @@ class SpriteManager:
 
 
     def add_player(self, player):
-        """ Adiciona aos grupos de sprites. """
+        """ Adiciona o player aos grupos de sprites. """
         self.player_sprites.add(player)
         self.all_sprites.add(player)
 
@@ -97,7 +97,7 @@ class SpriteManager:
     
 
     def update_all(self, delta_time):
-        """ Atualiza os sprites na tela. """
+        """ Chama o método update das entidades. """
         self.player_sprites.update(delta_time)
         self.mob_sprites.update(delta_time)
 
@@ -136,6 +136,7 @@ class SpriteManager:
 
     def reset_game(self):
         """ Reseta o estado das entidades e gera um novo mob. """
+        print('\n Reset... \n')
         self._reset_player()
         self._release_mobs()
         self._get_new_mobs()

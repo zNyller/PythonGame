@@ -37,6 +37,7 @@ class Troll(Mob, pygame.sprite.Sprite):
         self.strength = self.STRENGTH
         self.speed = self.MOVE_SPEED
         self.xp_points = self.XP_POINTS
+        self.type = 'Troll'
         self.initialize_image_attributes()
         self.initialize_combat_attributes()
         self.initialize_components()

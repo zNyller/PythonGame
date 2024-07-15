@@ -8,20 +8,20 @@ class ObjectPool:
 
 
     def get(self, *args, **kwargs) -> object:
-        """ 
-        Obtém um objeto resetado (caso contenha atributo 'reset') do pool, se disponível, 
+        """ Obtém um objeto resetado (caso contenha atributo 'reset') do pool, se disponível, 
         ou cria um novo objeto usando a função de fábrica com base no 'name'. 
         """
-        if self.pool:
-            obj = self.pool.pop()
-            if hasattr(obj, 'reset'):
-                obj.reset()  # Reinicia o objeto para o estado inicial, se tiver o método reset
-            return obj
-        else:
-            return self.factory(*args, **kwargs)
+        name = kwargs.get('name')
+        for obj in self.pool:
+            if obj.type == name:
+                self.pool.remove(obj)
+                if hasattr(obj, 'reset'):
+                    obj.reset() # Caso contenha o método reset, reseta para o estado inicial.
+                return obj
+        return self.factory(*args, **kwargs)
 
 
     def release(self, *objects):
-        """ Libera um ou mais objetos de volta ao pool para reutilização."""
+        """ Libera um ou mais objetos de volta ao pool para reutilização. """
         for obj in objects:
             self.pool.append(obj)
