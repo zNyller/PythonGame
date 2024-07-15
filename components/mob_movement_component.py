@@ -5,42 +5,43 @@ class MobMovementComponent:
 
     def __init__(self, mob, attack_component, event_manager) -> None:
         """ Inicializa os atributos necessários para gerenciar os movimentos. """
-        self.mob = mob
+        self.mobs = [mob]
         self.attack_component = attack_component
         self.event_manager = event_manager
 
 
-    def handle_collision(self, delta_time) -> None:
+    def handle_collision(self, delta_time: float) -> None:
         """ Verifica se houve colisão com o player e lida de acordo. """
-        self.move(delta_time) if not self.has_collided() else self.attack_component.attack()
+        for mob in self.mobs:
+            self.move(mob, delta_time) if not self.has_collided(mob) else self.attack_component.attack()
 
 
-    def has_collided(self) -> bool:
+    def has_collided(self, mob) -> bool:
         """ Verifica colisão com o jogador considerando uma distância mínima. """
         player_sprites = self.event_manager.notify({'type': 'get_player_sprites'})
         if player_sprites:
             for target in player_sprites:
                 distance_threshold = 150  # Distância mínima para considerar colisão
-                if abs(self.mob.rect.centerx - target.rect.centerx) <= distance_threshold:
+                if abs(mob.rect.centerx - target.rect.centerx) <= distance_threshold:
                     return True
         return False
 
 
-    def move(self, delta_time) -> None:
+    def move(self, mob, delta_time: float) -> None:
         """ Move o mob e limita o movimento dentro das bordas. """
         player_sprites = self.event_manager.notify({'type': 'get_player_sprites'})
         if player_sprites:
             for player in player_sprites:
-                if self.mob.rect.centerx <= player.rect.centerx:
-                    self.mob.direction = 1
-                    self.mob.rect.x += self.mob.speed * delta_time
-                else:
-                    self.mob.direction = -1
-                    self.mob.rect.x -= self.mob.speed * delta_time
-                self._limit_movements()
+                if mob.rect.centerx <= player.rect.centerx:
+                    mob.direction = 1
+                    mob.rect.x += mob.speed * delta_time
+                elif mob.rect.centerx >= player.rect.centerx:
+                    mob.direction = -1
+                    mob.rect.x -= mob.speed * delta_time
+                self._limit_movements(mob)
 
 
-    def _limit_movements(self) -> None:
+    def _limit_movements(self, mob) -> None:
         """ Limita os movimentos do mob dentro da janela do jogo. """
-        if self.mob.rect.left < LEFT_BOUNDARY or self.mob.rect.right > RIGHT_BOUNDARY:
-            self.mob.rect.center = self.INITIAL_POSITION
+        if mob.rect.left < LEFT_BOUNDARY or mob.rect.right > RIGHT_BOUNDARY:
+            mob.rect.center = mob.initial_position

@@ -16,9 +16,9 @@ class Soul(Mob, pygame.sprite.Sprite):
     """
 
     MAX_LIFE = 50
-    STRENGTH = 15
+    STRENGTH = 1 # 15
     MOVE_SPEED = 150
-    INITIAL_POSITION = (1150, 480)
+    INITIAL_POSITION = (1150, 465)
     ATTACK_RANGE = 365
     ATTACK_DURATION = 25
     XP_POINTS = 20
@@ -37,6 +37,7 @@ class Soul(Mob, pygame.sprite.Sprite):
         self.strength = self.STRENGTH
         self.speed = self.MOVE_SPEED
         self.xp_points = self.XP_POINTS
+        self.initial_position = self.INITIAL_POSITION
         self.type = 'Soul'
         self.initialize_image_attributes()
         self.initialize_combat_attributes()
@@ -50,9 +51,9 @@ class Soul(Mob, pygame.sprite.Sprite):
         visuais como amplitude e velocidade de flutuação.
         """
 
-        self.default_frames = self.images["default"]
-        self.attacking_image = self.images["attacking"]
-        self.image = self.default_frames
+        self.default_image = self.images["default"]
+        self.attack_image = self.images["attacking"]
+        self.image = self.default_image
         self.rect = self.image.get_rect(center = self.INITIAL_POSITION) 
         self.float_amplitude = self.FLOAT_AMPLITUDE
         self.float_speed = self.FLOAT_SPEED
@@ -66,7 +67,7 @@ class Soul(Mob, pygame.sprite.Sprite):
 
 
     def initialize_components(self) -> None:
-        """ Inicializa os componentes utilizados por Mob. """
+        """ Inicializa os componentes utilizados por Soul. """
         self.attack_component = BasicAttackComponent(
             entity=self, 
             damage=self.STRENGTH, 

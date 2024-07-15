@@ -21,6 +21,7 @@ class Game:
 
 
     def __init__(self) -> None:
+        """ Inicializa a biblioteca pygame e os componentes do jogo. """
         pygame.init()
         self._initialize_managers()
         self._initialize_factories()
@@ -67,7 +68,7 @@ class Game:
 
 
     def run(self) -> None:
-        """ Loop principal do jogo. """
+        """ Inicia o ciclo principal do jogo. """
         self.running = True
         try:
             while self.running:
@@ -79,7 +80,7 @@ class Game:
 
 
     def _game_loop(self) -> None:
-        """ Executa o ciclo do loop principal do jogo. """
+        """ Executa o ciclo do loop principal do jogo chamando os métodos correspondentes. """
         self.screen_manager.clock.tick(self.FPS)
         self._handle_events()
         self._update(self.FIXED_DELTA_TIME)
@@ -102,7 +103,7 @@ class Game:
     
 
     def _update(self, delta_time: float) -> None:
-        """ Atualiza os elementos na tela. """
+        """ Atualiza os sprites e a câmera. """
         self.sprite_manager.update_all(delta_time)
         self.camera.update(self.player)
 

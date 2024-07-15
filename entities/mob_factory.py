@@ -16,8 +16,8 @@ class MobFactory:
 
 
     def create_mob(self, name: str) -> Mob:
-        """
-        Cria um mob utilizando o nome fornecido e implementa dicionários com os recursos correspondentes.
+        """Cria um mob utilizando o nome fornecido e implementa dicionários com os recursos correspondentes.
+
         Configura todos os atributos necessários para o mob.
         Adiciona o mob ao grupo de sprite em sprite_manager, e por fim o retona.
         """
@@ -60,7 +60,8 @@ class MobFactory:
         sounds = {
             'blood_pop': self.resource_manager.get_sound('blood_pop'),
             'hit_player': self.resource_manager.get_sound('hit_player'),
-            'scream': self.resource_manager.get_sound('mob_pain')
+            'pain': self.resource_manager.get_sound('troll_pain'),
+            'death': self.resource_manager.get_sound('troll_death')
         }
         troll = Troll('Troll', images, sounds, self.event_manager)
         self.sprite_manager.add_mob(troll)

@@ -11,7 +11,7 @@ class Mob(ABC, pygame.sprite.Sprite):
     def __init__(self, event_manager) -> None:
         super().__init__()
         self.event_manager = event_manager
-        self._direction = 1 # 1 for right, -1 for left
+        self._direction = -1 # 1 for left, -1 for right
 
 
     @abstractmethod

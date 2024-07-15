@@ -18,11 +18,10 @@ class Troll(Mob, pygame.sprite.Sprite):
 
     MAX_LIFE = 60
     STRENGTH = 25
-    INITIAL_POSITION = (2150, 480)
-    MOVE_SPEED = 120
+    INITIAL_POSITION = (2150, 550)
+    MOVE_SPEED = 120 # 120
     ATTACK_RANGE = 200
     XP_POINTS = 20
-    ANIMATION_SPEED = 0.1
     ATTACK_DURATION = 20
     ATTACK_SPEED = 5
 
@@ -37,6 +36,7 @@ class Troll(Mob, pygame.sprite.Sprite):
         self.strength = self.STRENGTH
         self.speed = self.MOVE_SPEED
         self.xp_points = self.XP_POINTS
+        self.initial_position = self.INITIAL_POSITION
         self.type = 'Troll'
         self.initialize_image_attributes()
         self.initialize_combat_attributes()
@@ -44,21 +44,30 @@ class Troll(Mob, pygame.sprite.Sprite):
 
 
     def initialize_image_attributes(self) -> None:
-        self.idle_frames = self.images['idle_frames']
-        self.image = self.idle_frames[0]
+        """ Inicializa os atributos de imagem do Soul.
+
+        Define as imagens padrão e de ataque e posiciona o mob na tela.
+        """
+        self.default_frames = self.images['idle_frames']
+        self.attack_frames = self.images['idle_frames']
+        self.image = self.default_frames[0]
         self.rect = self.image.get_rect(center=self.INITIAL_POSITION)
 
 
     def initialize_combat_attributes(self) -> None:
+        """ Inicializa os atributos de combate. """
+        self.receive_damage_sound = self.sounds['pain']
+        self.death_sound = self.sounds['death']
         self.strength = self.STRENGTH
         self.attack_duration = self.ATTACK_DURATION
         self.attack_speed = self.ATTACK_SPEED
 
 
     def initialize_components(self) -> None:
+        """ Inicializa os componentes utilizados por Troll. """
         self.animation_component = BasicAnimationComponent(
             entity=self, 
-            animation_frames=self.idle_frames, 
+            animation_frames=self.default_frames, 
             event_manager=self.event_manager
         )
         self.attack_component = BasicAttackComponent(
