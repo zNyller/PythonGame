@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 class AnimationComponent(ABC):
+    """Classe abstrata para componentes de animação."""
 
     IDLE_STATE = 'idle'
 
@@ -9,12 +10,6 @@ class AnimationComponent(ABC):
         self.current_frame_index = 0 
         self.frame_counter = 0
 
-
     @abstractmethod
-    def update(self, delta_time):
-        pass
-
-
-    @abstractmethod
-    def reset(self):
+    def update(self, delta_time: float):
         pass

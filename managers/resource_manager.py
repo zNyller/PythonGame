@@ -2,60 +2,73 @@ import pygame
 from config.constants import IMAGES_DIR, SOUNDS_DIR
 
 class ResourceManager:
-    """Classe para gerenciar os recursos do jogo."""
+    """Gerencia os recursos do jogo."""
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """Inicializa os dicionários para armazenar imagens e sons."""
         self.images = {}
         self.sounds = {}
+        self.file_paths = {
+            'images': {
+                # Scenario
+                'background': 'background_2_sized.png',
+                # Player
+                'player_attacking': 'attack_spritesheet.png',
+                'player_spritesheet': 'player_spritesheet.png',
+                'cannon_attack': 'cannon_spritesheet.png',
+                'stats_interface': 'stats_interface.png',
+                'life_bar': 'life_bar.png',
+                'xp_bar': 'xp_bar.png',
+                # Enemy
+                'soul_default': 'soul_1.png',
+                'soul_attacking': 'soul_attacking.png',
+                'troll_idle_spritesheet': 'troll_idle_spritesheet.png',
+                'troll_damage_spritesheet': 'troll_damage_spritesheet.png',
+                'troll_death_spritesheet': 'troll_death_spritesheet.png',
+                'troll_spawn_spritesheet': 'troll_spawn_spritesheet.png'
+            },
+            'sounds': {
+                # Player
+                #'attack_sound': 'attack_sound.wav',
+                'attack_sound': 'zoio1.wav',
+                'attack_sound_2': 'zoio2.wav',
+                'cannon_sound': 'zoio3.wav',
+                'player_jump': 'player_jump.wav',
+                # Enemy
+                'blood_pop': 'blood_pop.wav',
+                'game_over': 'game_over.wav',
+                'hit_player': 'hit_player.wav',
+                'level_complete': 'level_complete.wav',
+                'mob_pain': 'monster_pain.wav',
+                'troll_pain': 'troll_pain.wav',
+                'troll_death': 'troll_death.wav'
+            }
+        }
         self.load_resources()
 
-
-    def load_resources(self):
-        """ Carrega imagens e sons necessários. """
-
+    def load_resources(self) -> None:
+        """Carrega imagens e sons necessários e armazena nos dicionários."""
         try:
-            self.images['background'] = pygame.image.load(f'{IMAGES_DIR}/background_2_sized.png').convert()
-            # Player
-            self.images['player_attacking'] = pygame.image.load(f'{IMAGES_DIR}/attack_spritesheet.png').convert_alpha()
-            self.images['player_spritesheet'] = pygame.image.load(f'{IMAGES_DIR}/player_spritesheet.png').convert_alpha()
-            self.images['cannon_attack'] = pygame.image.load(f'{IMAGES_DIR}/cannon_spritesheet.png').convert_alpha()
-            self.images['stats_interface'] = pygame.image.load(f'{IMAGES_DIR}/stats_interface.png').convert_alpha()
-            self.images['life_bar'] = pygame.image.load(f'{IMAGES_DIR}/life_bar.png').convert_alpha()
-            self.images['xp_bar'] = pygame.image.load(f'{IMAGES_DIR}/xp_bar.png').convert_alpha()
-            # Enemy
-            self.images['soul_default'] = pygame.image.load(f'{IMAGES_DIR}/soul_1.png').convert_alpha()
-            self.images['soul_attacking'] = pygame.image.load(f'{IMAGES_DIR}/soul_attacking.png').convert_alpha()
-            self.images['troll_idle'] = pygame.image.load(f'{IMAGES_DIR}/troll_idle.png').convert_alpha()
-            self.images['troll_damage'] = pygame.image.load(f'{IMAGES_DIR}/troll_damage.png').convert_alpha()
-            self.images['troll_death'] = pygame.image.load(f'{IMAGES_DIR}/troll_death.png').convert_alpha()
-            self.images['troll_spawn'] = pygame.image.load(f'{IMAGES_DIR}/troll_spawn.png').convert_alpha()
-
-            # Player
-            #self.sounds['attack_sound'] = pygame.mixer.Sound(f'{SOUNDS_DIR}/attack_sound.wav')
-            self.sounds['attack_sound'] = pygame.mixer.Sound(f'{SOUNDS_DIR}/zoio1.wav')
-            self.sounds['attack_sound_2'] = pygame.mixer.Sound(f'{SOUNDS_DIR}/zoio2.wav')
-            self.sounds['cannon_sound'] = pygame.mixer.Sound(f'{SOUNDS_DIR}/zoio3.wav')
-            self.sounds['player_jump'] = pygame.mixer.Sound(f'{SOUNDS_DIR}/player_jump.wav')
-            # Enemy
-            self.sounds['blood_pop'] = pygame.mixer.Sound(f'{SOUNDS_DIR}/blood_pop.wav')
-            self.sounds['game_over'] = pygame.mixer.Sound(f'{SOUNDS_DIR}/game_over.wav')
-            self.sounds['hit_player'] = pygame.mixer.Sound(f'{SOUNDS_DIR}/hit_player.wav')
-            self.sounds['level_complete'] = pygame.mixer.Sound(f'{SOUNDS_DIR}/level_complete.wav')
-            self.sounds['mob_pain'] = pygame.mixer.Sound(f'{SOUNDS_DIR}/monster_pain.wav')
-            self.sounds['troll_pain'] = pygame.mixer.Sound(f'{SOUNDS_DIR}/troll_pain.wav')
-            self.sounds['troll_death'] = pygame.mixer.Sound(f'{SOUNDS_DIR}/troll_death.wav')
-
-        except Exception as e:
-            print(f"Erro ao carregar os recursos: {e}")
+            self._load_images()
+            self._load_sounds()
+        except FileNotFoundError as e:
+            print(f"Erro: {e} - Arquivo não encontrado.")
         else:
             print(f"Sucesso ao carregar os recursos!")
 
+    def _load_images(self) -> None:
+        for name, file in self.file_paths['images'].items():
+            image = pygame.image.load(f'{IMAGES_DIR}/{file}')
+            self.images[name] = image.convert_alpha() if name != 'background' else image.convert()
 
-    def get_image(self, name):
-        """Retorna uma imagem pelo nome."""
+    def _load_sounds(self) -> None:
+        for name, file in self.file_paths['sounds'].items():
+            self.sounds[name] = pygame.mixer.Sound(f'{SOUNDS_DIR}/{file}')
+
+    def get_image(self, name: str) -> pygame.Surface:
+        """Retorna uma imagem com base no 'name'."""
         return self.images.get(name)
-    
 
-    def get_sound(self, name):
-        """Retorna um som pelo nome."""
+    def get_sound(self, name: str) -> pygame.mixer.Sound:
+        """Retorna um som com base no 'name'."""
         return self.sounds.get(name)

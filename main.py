@@ -4,7 +4,8 @@ import pstats
 from core.game import Game
 
 
-def main():
+def main() -> None:
+    """Função principal. Chama o método run de Game para iniciar o jogo."""
     game = Game()
     game.run()
 

@@ -1,15 +1,14 @@
 import pygame
 
 from entities.mob import Mob
-from config.constants import LEFT_BOUNDARY, RIGHT_BOUNDARY, RED
+from config.constants import RED
 from components.basic_animation_component import BasicAnimationComponent
 from components.basic_attack_component import BasicAttackComponent
 from components.life_bar_component import LifeBarComponent
 from components.mob_movement_component import MobMovementComponent
 
 class Troll(Mob, pygame.sprite.Sprite):
-    """
-    Entidade inimiga que representa um Mob "Troll" no jogo.
+    """Entidade inimiga que representa um Mob "Troll" no jogo.
 
     Configura atributos específicos como vida, força, velocidade, e comportamentos como movimento e ataques.
 
@@ -18,15 +17,15 @@ class Troll(Mob, pygame.sprite.Sprite):
 
     MAX_LIFE = 60
     STRENGTH = 25
-    INITIAL_POSITION = (2150, 550)
+    INITIAL_POSITION = (2150, 540)
     MOVE_SPEED = 120 # 120
     ATTACK_RANGE = 200
     XP_POINTS = 20
     ATTACK_DURATION = 20
     ATTACK_SPEED = 5
 
-
     def __init__(self, name, images, sounds, event_manager) -> None:
+        """Inicializa os atributos específicos do Troll."""
         super().__init__(event_manager)
         self.name = name
         self.images = images
@@ -42,9 +41,8 @@ class Troll(Mob, pygame.sprite.Sprite):
         self.initialize_combat_attributes()
         self.initialize_components()
 
-
     def initialize_image_attributes(self) -> None:
-        """ Inicializa os atributos de imagem do Soul.
+        """Inicializa os atributos de imagem do Troll.
 
         Define as imagens padrão e de ataque e posiciona o mob na tela.
         """
@@ -53,18 +51,16 @@ class Troll(Mob, pygame.sprite.Sprite):
         self.image = self.default_frames[0]
         self.rect = self.image.get_rect(center=self.INITIAL_POSITION)
 
-
     def initialize_combat_attributes(self) -> None:
-        """ Inicializa os atributos de combate. """
+        """Inicializa os atributos de combate do Troll."""
         self.receive_damage_sound = self.sounds['pain']
         self.death_sound = self.sounds['death']
         self.strength = self.STRENGTH
         self.attack_duration = self.ATTACK_DURATION
         self.attack_speed = self.ATTACK_SPEED
 
-
     def initialize_components(self) -> None:
-        """ Inicializa os componentes utilizados por Troll. """
+        """Inicializa os componentes utilizados por Troll."""
         self.animation_component = BasicAnimationComponent(
             entity=self, 
             animation_frames=self.default_frames, 
@@ -91,7 +87,6 @@ class Troll(Mob, pygame.sprite.Sprite):
             event_manager=self.event_manager
         )
 
-
     def update(self, delta_time) -> None:
-        """ Atualiza a direção, o movimento, os ataques e a barra de vida do mob. """
+        """Atualiza a direção, o movimento, os ataques e a barra de vida do mob."""
         super().update(delta_time)

@@ -25,7 +25,6 @@ class Soul(Mob, pygame.sprite.Sprite):
     FLOAT_AMPLITUDE = 10
     FLOAT_SPEED = 6
 
-
     def __init__(self, name: str, images: dict, sounds: dict, event_manager) -> None:
         """ Inicializa os atributos específicos para Soul. """
         super().__init__(event_manager)
@@ -43,14 +42,12 @@ class Soul(Mob, pygame.sprite.Sprite):
         self.initialize_combat_attributes()
         self.initialize_components()
 
-
     def initialize_image_attributes(self) -> None:
         """ Inicializa os atributos de imagem do Soul.
 
         Define as imagens padrão e de ataque, posiciona o mob na tela e configura parâmetros
         visuais como amplitude e velocidade de flutuação.
         """
-
         self.default_image = self.images["default"]
         self.attack_image = self.images["attacking"]
         self.image = self.default_image
@@ -59,12 +56,10 @@ class Soul(Mob, pygame.sprite.Sprite):
         self.float_speed = self.FLOAT_SPEED
         self.float_offset = 0
 
-
     def initialize_combat_attributes(self) -> None:
         """ Inicializa os atributos de combate. """
         self.receive_damage_sound = self.sounds["scream"]
         self.death_sound = self.sounds["blood_pop"]
-
 
     def initialize_components(self) -> None:
         """ Inicializa os componentes utilizados por Soul. """
@@ -89,14 +84,12 @@ class Soul(Mob, pygame.sprite.Sprite):
             event_manager=self.event_manager
         )
 
-
-    def update(self, delta_time) -> None:
+    def update(self, delta_time: float) -> None:
         """ Atualiza a direção, o movimento, os ataques, a barra de vida e a flutuação do mob. """
         super().update(delta_time)
         self._update_float(delta_time)
 
-
-    def _update_float(self, delta_time) -> None:
+    def _update_float(self, delta_time: float) -> None:
         """ Atualiza a posição y do mob para criar um efeito de flutuação. """
         self.float_offset += self.float_speed * delta_time
         float_y = self.INITIAL_POSITION[1] + self.float_amplitude * math.sin(self.float_offset)

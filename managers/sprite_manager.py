@@ -1,8 +1,14 @@
 import pygame
+from typing import Any, Dict, Optional
+from managers.resource_manager import ResourceManager
+from managers.event_manager import EventManager
+from entities.player import Player
+from entities.mob import Mob
+from core.camera import Camera
 
 class SpriteManager:
     """Gerencia os sprites do jogo."""
-
+    
     PLAYER_SPRITE_COORDS = [
         (5, 8, 290, 148),    # Sprite 1 (1ª linha, 1ª coluna)
         (302, 6, 290, 150),  # Sprite 2 (1ª linha, 2ª coluna)
@@ -56,17 +62,51 @@ class SpriteManager:
         (2817, 3338, 297, 150), # [4/8]
     ]
     TROLL_SPRITE_COORDS = [
-        (0, 2, 150, 90),
-        (162, 0, 144, 90),
-        (2, 118, 142, 90),
-        (162, 116, 139, 92),
-        (2, 234, 142, 94),
-        (160, 232, 139, 96),
-        (0, 354, 140, 94),
-        (162, 356, 142, 92)
+        (6, 34, 186, 108),
+        (208, 31, 180, 111),
+        (8, 178, 178, 113),
+        (208, 176, 175, 115),
+        (8, 324, 177, 119),
+        (207, 321, 175, 121),
+        (6, 474, 175, 118),
+        (208, 476, 177, 115)
+    ]
+    TROLL_DAMAGE_COORDS = [
+        (34, 32, 175, 107),
+        (270, 4, 194, 136),
+        (12, 245, 193, 133),
+        (268, 239, 198, 142),
+        (11, 486, 194, 136)
+    ]
+    TROLL_DEATH_COORDS = [
+        (48, 69, 191, 132),
+        (304, 69, 190, 133),
+        (559, 69, 190, 133),
+        (813, 69, 190, 133),
+        (1066, 69, 189, 133),
+        (48, 304, 190, 133),
+        (304, 304, 190, 133),
+        (559, 304, 190, 133),
+        (813, 304, 190, 130),
+        (1066, 304, 190, 128),
+        (48, 552, 190, 128),
+        (304, 552, 191, 128),
+        (559, 552, 192, 128),
+        (813, 552, 190, 128),
+        (1066, 552, 194, 130),
+        (48, 815, 190, 130),
+        (304, 815, 190, 130),
+        (559, 815, 190, 130),
+        (813, 815, 190, 130),
+        (1066, 815, 190, 130)
     ]
 
-    def __init__(self, resource_manager, event_manager):
+    def __init__(
+            self: 'SpriteManager', 
+            resource_manager: ResourceManager, 
+            event_manager: EventManager
+        ) -> None:
+        """Inicializa os grupos de sprites."""
         self.event_manager = event_manager
         self.resource_manager = resource_manager
         self.all_sprites = pygame.sprite.Group()
@@ -78,31 +118,21 @@ class SpriteManager:
         self.troll_sprite_coords = self.TROLL_SPRITE_COORDS
         self._subscribe_to_events()
 
-
-    def _subscribe_to_events(self):
+    def _subscribe_to_events(self) -> None:
         self.event_manager.subscribe('get_mob_sprites', self)
         self.event_manager.subscribe('get_player_sprites', self)
 
-
-    def add_player(self, player):
+    def add_player(self, player: Player) -> None:
         """ Adiciona o player aos grupos de sprites. """
         self.player_sprites.add(player)
         self.all_sprites.add(player)
 
-
-    def add_mob(self, mob):
+    def add_mob(self, mob: Mob) -> None:
         """ Adiciona um mob ao grupo de mobs e grupo de todos os sprites. """
         self.mob_sprites.add(mob)
         self.all_sprites.add(mob)
-    
 
-    def update_all(self, delta_time):
-        """ Chama o método update das entidades. """
-        self.player_sprites.update(delta_time)
-        self.mob_sprites.update(delta_time)
-
-
-    def draw_all(self, screen, camera):
+    def draw_all(self, screen: pygame.Surface, camera: Camera) -> None:
         """Desenha os sprites e seus elementos na tela."""
         for entity in self.all_sprites:
             screen.blit(entity.image, camera.apply(entity))
@@ -110,53 +140,58 @@ class SpriteManager:
                 entity.draw_stats_bar(screen)
             elif hasattr(entity, 'draw_life_bar'):
                 entity.draw_life_bar(screen, camera)
+    
+    def update_all(self, delta_time: float) -> None:
+        """ Chama o método update das entidades. """
+        self.player_sprites.update(delta_time)
+        self.mob_sprites.update(delta_time)
 
-
-    def get_sprite(self, spritesheet, x, y, width, height):
-        """ Retorna uma superfície (sprite) recortada do spritesheet nas coordenadas (x, y). """
+    def get_sprite(
+            self, 
+            spritesheet: pygame.Surface, 
+            x: int, 
+            y: int, 
+            width: int, 
+            height: int
+        ) -> pygame.Surface:
+        """Retorna uma superfície (sprite) recortada do spritesheet nas coordenadas (x, y)."""
         sprite = pygame.Surface((width, height), pygame.SRCALPHA)
         sprite.blit(spritesheet, (0, 0), (x, y, width, height))
         return sprite
     
-
-    def get_player_sprites(self):
+    def get_player_sprites(self) -> pygame.sprite.Group:
         return self.player_sprites
     
-
-    def get_mob_sprites(self):
+    def get_mob_sprites(self) -> pygame.sprite.Group:
         return self.mob_sprites
     
-
-    def notify(self, event):
+    def notify(self, event: Dict[str, Any]) -> Optional[pygame.Surface]:
+        """Chama os métodos inscritos no tipo do evento recebido."""
         if event['type'] == 'get_mob_sprites':
             return self.get_mob_sprites()
         elif event['type'] == 'get_player_sprites':
             return self.get_player_sprites()
     
-
-    def reset_game(self):
-        """ Reseta o estado das entidades e gera um novo mob. """
+    def reset_game(self) -> None:
+        """Reseta o estado das entidades e gera um novo mob."""
         print('\n Reset... \n')
         self._reset_player()
         self._release_mobs()
         self._get_new_mobs()
 
-
-    def _reset_player(self):
+    def _reset_player(self) -> None:
         if not self.player_sprites:
             self.event_manager.notify({'type': 'create_player'})
         else:
             for player in self.player_sprites:
                 player.reset()
 
-
-    def _release_mobs(self):
+    def _release_mobs(self) -> None:
         for mob in self.mob_sprites:
             self.event_manager.notify({'type': 'release_mob', 'mob': mob})
             mob.kill()
 
-
-    def _get_new_mobs(self):
+    def _get_new_mobs(self) -> None:
         mob_types = ['Soul', 'Troll']
         new_mobs = [self.event_manager.notify({'type': 'get_mob', 'name': mob}) for mob in mob_types]
         for mob in new_mobs:
