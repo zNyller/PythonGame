@@ -23,6 +23,7 @@ class ResourceManager:
                 'soul_default': 'soul_1.png',
                 'soul_attacking': 'soul_attacking.png',
                 'troll_idle_spritesheet': 'troll_idle_spritesheet.png',
+                'troll_attack_spritesheet': 'troll_attack_spritesheet.png',
                 'troll_damage_spritesheet': 'troll_damage_spritesheet.png',
                 'troll_death_spritesheet': 'troll_death_spritesheet.png',
                 'troll_spawn_spritesheet': 'troll_spawn_spritesheet.png'

@@ -1,9 +1,9 @@
 import pygame
 
 from managers.event_manager import EventManager
-from components.basic_animation_component import BasicAnimationComponent
-from components.player_attack_component import PlayerAttackComponent
-from components.basic_movement_component import BasicMovementComponent
+from components.animation.basic_animation_component import BasicAnimationComponent
+from components.attack.player_atk_component import PlayerAttackComponent
+from components.movement.basic_movement_component import BasicMovementComponent
 from components.stats_bar_component import StatsBarComponent
 from entities.level_manager import LevelManager
 

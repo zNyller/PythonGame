@@ -1,5 +1,5 @@
 import pygame
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 from managers.resource_manager import ResourceManager
 from managers.event_manager import EventManager
 from entities.player import Player
@@ -62,14 +62,14 @@ class SpriteManager:
         (2817, 3338, 297, 150), # [4/8]
     ]
     TROLL_SPRITE_COORDS = [
-        (6, 34, 186, 108),
-        (208, 31, 180, 111),
-        (8, 178, 178, 113),
-        (208, 176, 175, 115),
-        (8, 324, 177, 119),
-        (207, 321, 175, 121),
-        (6, 474, 175, 118),
-        (208, 476, 177, 115)
+        (6, 21, 186, 120), # 33, 108
+        (208, 21, 180, 120), # 31, 110
+        (8, 171, 178, 120), # 178, 113
+        (208, 171, 175, 120), # 176, 115
+        (8, 322, 177, 120), # 324, 118
+        (207, 321, 175, 120), # 321, 120
+        (6, 470, 175, 120), # 472, 118
+        (208, 469, 177, 120) # 474, 115
     ]
     TROLL_DAMAGE_COORDS = [
         (34, 32, 175, 107),
@@ -99,6 +99,13 @@ class SpriteManager:
         (559, 815, 190, 130),
         (813, 815, 190, 130),
         (1066, 815, 190, 130)
+    ]
+    TROLL_ATTACK_COORDS = [
+        (0, 8, 136, 127),
+        (190, 28, 155, 106),
+        (404, 27, 169, 108),
+        (586, 29, 169, 105),
+        (800, 26, 169, 108)
     ]
 
     def __init__(
@@ -165,7 +172,7 @@ class SpriteManager:
     def get_mob_sprites(self) -> pygame.sprite.Group:
         return self.mob_sprites
     
-    def notify(self, event: Dict[str, Any]) -> Optional[pygame.Surface]:
+    def notify(self, event: Dict[str, Any]) -> pygame.Surface | None:
         """Chama os métodos inscritos no tipo do evento recebido."""
         if event['type'] == 'get_mob_sprites':
             return self.get_mob_sprites()

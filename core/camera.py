@@ -1,6 +1,9 @@
 import pygame
-from entities.player import Player
-from entities.mob import Mob
+from typing import Union, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from entities.player import Player
+    from entities.mob import Mob
 
 class Camera:
     """Câmera que acompanha as entidades."""
@@ -15,13 +18,13 @@ class Camera:
         self.map_width = map_width
         self.map_height = map_height
 
-    def apply(self, entity: Player | Mob) -> pygame.Rect:
+    def apply(self, entity: Union['Player', 'Mob']) -> pygame.Rect:
         """Aplica a câmera à entidade."""
         if hasattr(entity, 'rect'):
             return entity.rect.move(self.camera.topleft)
         return entity.move(self.camera.topleft)
 
-    def update(self, target: Player | Mob) -> None:
+    def update(self, target: Union['Player', 'Mob']) -> None:
         """Atualiza a posição da câmera com base na posição do alvo."""
         x = -target.rect.centerx + int(self.width / 2)
         y = -target.rect.centery + int(self.height / 2)
