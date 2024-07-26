@@ -1,0 +1,2 @@
+# Lista de dependências do projeto.
+pygame==2.6.0
