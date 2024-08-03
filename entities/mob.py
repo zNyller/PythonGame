@@ -50,7 +50,9 @@ class Mob(ABC, pygame.sprite.Sprite):
         """Recebe a quantidade de dano e notifica os listeners."""
         self.life -= damage
         self.receive_damage_sound.play()
-        self._event_manager.notify({'type': 'damage_event', 'target': self, 'damage': damage})
+        self._event_manager.notify(
+            {'type': 'damage_event', 'target': self, 'damage': damage, 'animation_frames': self.damage_frames}
+        )
 
     def defeat(self) -> None:
         """Efeito de morte e notifica os listeners."""

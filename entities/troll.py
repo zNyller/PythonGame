@@ -46,7 +46,9 @@ class Troll(Mob, pygame.sprite.Sprite):
         Define as imagens padrão e de ataque e posiciona o mob na tela.
         """
         self.default_frames = self._images['idle_frames']
-        self.attack_frames = self._images['idle_frames']
+        self.attack_frames = self._images['attack_frames']
+        self.damage_frames = self._images['damage_frames']
+        self.death_frames = self._images['death_frames']
         self.image = self.default_frames[0]
         self.rect = self.image.get_rect(center=self._initial_position)
 

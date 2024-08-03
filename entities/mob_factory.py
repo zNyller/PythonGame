@@ -90,7 +90,7 @@ class MobFactory:
         }
         troll_sprites = {
             'idle_frames': self._get_sprites(troll_spritesheets['idle']),
-            'attacking_frames': self._get_sprites(troll_spritesheets['attack']),
+            'attack_frames': self._get_sprites(troll_spritesheets['attack']),
             'damage_frames': self._get_sprites(troll_spritesheets['damage']),
             'death_frames': self._get_sprites(troll_spritesheets['death']),
             'spawn_frames': self._get_sprites(troll_spritesheets['spawn'])

@@ -13,6 +13,13 @@ class BasicAnimationComponent(AnimationComponent):
         self.event_manager = event_manager
         self.animation_speed = self.IDLE_ANIMATION_SPEED
         self.last_frame_index = -1  # Rastrear quando a imagem realmente muda
+        self._state = 'idle'
+        self.event_manager.subscribe('damage_event', self)
+
+    def notify(self, event):
+        if event['type'] == 'damage_event':
+            self.entity = event['target']
+            self.animation_frames = event['animation_frames']
 
     def update(self, delta_time: float) -> None:
         """ Incrementa o contador de animação e atualiza o frame. """

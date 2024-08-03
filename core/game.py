@@ -26,6 +26,7 @@ class Game:
         """Inicializa a biblioteca pygame e os componentes do jogo."""
         pygame.init()
         self._running = False
+        self._menu = False
         self._initialize_managers()
         self._initialize_factories()
         self._initialize_entities()
@@ -61,6 +62,10 @@ class Game:
         self._player = self._player_factory.create_player()
         self._mob_factory.create_mob("Soul")
         self._mob_factory.create_mob("Troll")
+
+    def menu(self):
+        """Inicia o menu do jogo."""
+        self._menu = True
 
     def run(self) -> None:
         """Inicia o ciclo principal do jogo."""
