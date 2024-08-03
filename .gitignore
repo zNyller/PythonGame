@@ -1,0 +1,25 @@
+# Arquivos bytecode compilados
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Arquivos de sistema do Windows
+Thumbs.db
+
+# Logs
+logs/
+*.log
+*.out
+*.err
+
+# Dados temporários
+tmp/
+
+# Arquivos de configuração de IDE
+.vscode/
+.idea/
