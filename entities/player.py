@@ -1,4 +1,5 @@
 import pygame
+from typing import Dict
 
 from managers.event_manager import EventManager
 from components.animation.basic_animation_component import BasicAnimationComponent
@@ -8,7 +9,7 @@ from components.stats_bar_component import StatsBarComponent
 from entities.level_manager import LevelManager
 
 class Player(pygame.sprite.Sprite):
-    """ Uma classe para representar o jogador. """
+    """Uma classe para representar o jogador."""
 
     MAX_LIFE = 100
     INITIAL_POSITION = (200, 515)
@@ -18,8 +19,13 @@ class Player(pygame.sprite.Sprite):
     SWORD_DAMAGE = 20
     SPECIAL_DAMAGE = 30
 
-    def __init__(self, images: dict, sounds: dict, event_manager: EventManager) -> None:
-        """ Inicializa um novo jogador e configura seus atributos. """ 
+    def __init__(
+            self: 'Player', 
+            images: Dict[str, pygame.Surface], 
+            sounds: Dict[str, pygame.mixer.Sound], 
+            event_manager: EventManager
+        ) -> None:
+        """Inicializa um novo jogador e configura seus atributos.""" 
         super().__init__()
         self.name = 'Guts'
         self.images = images
@@ -83,17 +89,17 @@ class Player(pygame.sprite.Sprite):
         self.level_manager = LevelManager(self, self.event_manager)
 
     def draw_stats_bar(self, screen: pygame.Surface) -> None:
-        """ Desenha a barra de stats do jogador. """
+        """Desenha a barra de stats do jogador."""
         self.stats_bar_component.draw_stats_bar(screen)
 
     def update(self, delta_time: float) -> None:
-        """ Atualiza o estado do jogador. """
+        """Atualiza o estado do jogador."""
         self.animation_component.update(delta_time)
         self.handle_events()
         self._update_components(delta_time)
 
     def handle_events(self) -> None:
-        """ Lida com os eventos do jogador, como ataques. """
+        """Lida com os eventos do jogador, como ataques."""
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
             self.attack_component.attack(1)
@@ -101,43 +107,43 @@ class Player(pygame.sprite.Sprite):
             self.attack_component.attack(2)
 
     def receive_damage(self, damage: int) -> None:
-        """ Reduz a vida do player e notifica os listeners. """
+        """Reduz a vida do player e notifica os listeners."""
         self.life -= damage
         self.receive_damage_sound.play()
-        self.event_manager.notify(
-            event={'type': 'damage_event', 'target': self, 'damage': damage}
-        )
+        # self.event_manager.notify(
+        #     event={'type': 'player_damage_event', 'target': self, 'damage': damage}
+        # )
 
     def defeat(self) -> None:
-        """ Lida com os efeitos de game over. """
+        """Lida com os efeitos de game over."""
         self.death_sound.play()
 
     def reset(self) -> None:
-        """ Reseta a posição e vida do jogador. """
+        """Reseta a posição e vida do jogador."""
         self.rect.center = self.INITIAL_POSITION
         self._life = self.MAX_LIFE
 
     def _update_components(self, delta_time: float) -> None:
-        """ Atualiza os componentes do player. """
+        """Atualiza os componentes do player."""
         self.attack_component.update(delta_time)
         self.movement_component.update(self.rect, delta_time)
 
     @property
     def life(self) -> int:
-        """ Retorna o valor atual da vida do jogador. """
+        """Retorna o valor atual da vida do jogador."""
         return self._life
 
     @life.setter
     def life(self, value: int) -> None:
-        """ Define o valor da vida do jogador. """
+        """Define o valor da vida do jogador."""
         self._life = max(0, value)
 
     @property
     def attack_damage(self) -> int:
-        """ Retorna o dano de ataque atual do jogador. """
+        """Retorna o dano de ataque atual do jogador."""
         return self._attack_damage
 
     @attack_damage.setter
     def attack_damage(self, value: int) -> None:
-        """ Define o valor do dano de ataque do jogador. """
+        """Define o valor do dano de ataque do jogador."""
         self._attack_damage = max(0, value)

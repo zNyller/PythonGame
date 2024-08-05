@@ -14,7 +14,7 @@ class Troll(Mob, pygame.sprite.Sprite):
     Utiliza métodos da classe Mob para gerenciar comportamentos genéricos de entidades.
     """
 
-    MAX_LIFE = 60
+    MAX_LIFE = 160 # 60
     STRENGTH = 25
     INITIAL_POSITION = (2150, 535)
     MOVE_SPEED = 140

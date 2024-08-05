@@ -2,6 +2,8 @@ from typing import Any, Dict, TYPE_CHECKING
 from entities.player import Player
 
 if TYPE_CHECKING:
+    from pygame.surface import Surface
+    from pygame.mixer import Sound
     from managers.event_manager import EventManager
     from managers.resource_manager import ResourceManager
     from managers.sprite_manager import SpriteManager
@@ -10,7 +12,7 @@ class PlayerFactory:
     """Classe para fabricar jogadores."""
 
     def __init__(
-            self, 
+            self: 'PlayerFactory', 
             event_manager: 'EventManager', 
             resource_manager: 'ResourceManager', 
             sprite_manager: 'SpriteManager'
@@ -19,10 +21,10 @@ class PlayerFactory:
         self.event_manager = event_manager
         self.resource_manager = resource_manager
         self.sprite_manager = sprite_manager
-        self.event_manager.subscribe('create_player', self)
+        self.event_manager.subscribe(event_type='create_player', listener=self)
 
     def create_player(self) -> Player:
-        """Cria um jogador utilizando o nome fornecido.
+        """Cria um novo jogador.
         
         Implementa dicionários com os recursos correspondentes.
         Adiciona o jogador ao grupo de sprite em sprite_manager, e por fim o retorna.
@@ -38,11 +40,10 @@ class PlayerFactory:
         if event['type'] == 'create_player':
             return self.create_player()
         
-    def _load_images(self) -> Dict[str, Any]:
+    def _load_images(self) -> Dict[str, 'Surface']:
         spritesheet = self.resource_manager.get_image('player_spritesheet')
         attack_spritesheet = self.resource_manager.get_image('player_attacking')
         cannon_attack = self.resource_manager.get_image('cannon_attack')
-        
         player_sprites = [
             self.sprite_manager.get_sprite(spritesheet, *coords) 
             for coords in self.sprite_manager.player_sprite_coords
@@ -55,7 +56,6 @@ class PlayerFactory:
             self.sprite_manager.get_sprite(cannon_attack, *coords) 
             for coords in self.sprite_manager.cannon_attack_coords
         ]
-
         return {
             'default': player_sprites,
             'attacking': attack_sprites,
@@ -65,7 +65,7 @@ class PlayerFactory:
             'xp_bar': self.resource_manager.get_image('xp_bar')
         }
     
-    def _load_sounds(self) -> Dict[str, Any]:
+    def _load_sounds(self) -> Dict[str, 'Sound']:
         return {
             'attacking': self.resource_manager.get_sound('attack_sound'),
             'attacking2': self.resource_manager.get_sound('attack_sound_2'),

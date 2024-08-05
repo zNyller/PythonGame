@@ -1,5 +1,5 @@
 import pygame
-from typing import Any, Dict, Optional, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
 from entities.soul import Soul
 from entities.troll import Troll
 from utils.object_pool import ObjectPool
@@ -12,7 +12,6 @@ if TYPE_CHECKING:
 
 class MobFactory:
     """Fabrica os mobs do jogo."""
-
     def __init__(
             self, 
             event_manager: 'EventManager', 
@@ -89,19 +88,25 @@ class MobFactory:
             'spawn': self.resource_manager.get_image('troll_spawn_spritesheet')
         }
         troll_sprites = {
-            'idle_frames': self._get_sprites(troll_spritesheets['idle']),
-            'attack_frames': self._get_sprites(troll_spritesheets['attack']),
-            'damage_frames': self._get_sprites(troll_spritesheets['damage']),
-            'death_frames': self._get_sprites(troll_spritesheets['death']),
-            'spawn_frames': self._get_sprites(troll_spritesheets['spawn'])
+            'idle_frames': self._get_sprites(troll_spritesheets['idle'], 'idle'),
+            'attack_frames': self._get_sprites(troll_spritesheets['attack'], 'attack'),
+            'damage_frames': self._get_sprites(troll_spritesheets['damage'], 'damage'),
+            'death_frames': self._get_sprites(troll_spritesheets['death'], 'death'),
+            #'spawn_frames': self._get_sprites(troll_spritesheets['spawn'], 'spawn')
         }
         return troll_sprites
 
-    def _get_sprites(self, spritesheet: pygame.Surface) -> list:
-        # Extrai sprites de um spritesheet.
+    def _get_sprites(
+            self, 
+            spritesheet: pygame.Surface, 
+            animation_type: str
+        ) -> List[pygame.Surface]:
+        # Extrai sprites de um spritesheet com base no tipo de animação fornecido.
+        coords = self.sprite_manager.troll_sprite_coords.get(animation_type, [])
+        if not coords:
+            raise ValueError(f'Coordenadas não encontradas para {animation_type}')
         return [
-            self.sprite_manager.get_sprite(spritesheet, *coords) 
-            for coords in self.sprite_manager.troll_sprite_coords
+            self.sprite_manager.get_sprite(spritesheet, *coord) for coord in coords
         ]
 
     def _get_mob(self, name: str) -> 'Mob':

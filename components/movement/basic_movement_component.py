@@ -1,7 +1,10 @@
 import pygame
+from typing import TYPE_CHECKING
 from .movement_interface import MovementComponent
-from managers.event_manager import EventManager
 from config.constants import LEFT_BOUNDARY, RIGHT_BOUNDARY
+
+if TYPE_CHECKING:
+    from managers.event_manager import EventManager
 
 class BasicMovementComponent(MovementComponent):
     """Componente de movimento para as entidades do jogo.
@@ -9,16 +12,16 @@ class BasicMovementComponent(MovementComponent):
     Gerencia o movimento com base nas teclas pressionadas e limita entre as bordas da janela.
     """
     def __init__(
-            self, 
+            self: 'BasicMovementComponent', 
             entity_rect: pygame.Rect, 
             movement_speed: int, 
-            event_manager: EventManager
+            event_manager: 'EventManager'
         ) -> None:
         super().__init__()
         self.entity_rect = entity_rect
         self.movement_speed = movement_speed
         self.event_manager = event_manager
-        self.state = 'idle'
+        self.state = self.IDLE_STATE
         self.facing_right = True
         self._subscribe_to_events()
 
@@ -28,7 +31,7 @@ class BasicMovementComponent(MovementComponent):
 
     def update(self, player_rect: pygame.Rect, delta_time: float) -> None:
         """Atualiza os movimentos."""
-        if self.state == 'idle':
+        if self.state == self.IDLE_STATE:
             self.handle_movements(delta_time)
         if player_rect:
             self.sync_player_rect(player_rect)

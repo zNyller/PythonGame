@@ -59,7 +59,7 @@ class AttackAnimationComponent(AnimationComponent):
         self.entity.image = self._get_current_frame()
         if self.entity.movement_component.facing_right:
             self.entity.image = pygame.transform.flip(self.entity.image, True, False)
-        self.entity.rect = self.entity.image.get_rect(centerx=self.entity.rect.centerx, bottom = self._initial_rect.bottom + 6)
+        self.entity.rect = self.entity.image.get_rect(centerx=self.entity.rect.centerx, bottom=self._initial_rect.bottom + 6)
 
     def _get_current_frame(self) -> pygame.Surface:
         """Retorna o frame atual baseado no tipo de ataque."""

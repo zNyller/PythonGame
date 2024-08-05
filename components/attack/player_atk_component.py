@@ -38,8 +38,10 @@ class PlayerAttackComponent(AttackComponent):
         """Atualiza o estado de ataque."""
         if self.state == self.ATTACK_STATE:
             self._attack_animation.update(delta_time)
-            self._attack_hitbox.update_hitbox(self._attack_animation.attack_type, 
-                                             self._attack_animation.current_frame_index)
+            self._attack_hitbox.update_hitbox(
+                self._attack_animation.attack_type, 
+                self._attack_animation.current_frame_index
+            )
             self._perform_attack()
             if self._attack_animation.duration_timer <= 0:
                 self._reset_attack()

@@ -6,6 +6,8 @@ class MovementComponent(ABC):
     Define a interface que todos componentes de movimento devem implementar.
     """
 
+    IDLE_STATE = 'idle'
+
     @abstractmethod
     def handle_movements(self):
         pass

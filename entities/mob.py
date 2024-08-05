@@ -21,17 +21,17 @@ class Mob(ABC, pygame.sprite.Sprite):
     @abstractmethod
     def initialize_image_attributes(self):
         """Inicializa os atributos de imagem do Mob."""
-        pass
+        raise NotImplementedError('As subclasses de "Mob" devem implementar este método.')
 
     @abstractmethod
     def initialize_combat_attributes(self):
         """Inicializa os atributos de combate."""
-        pass
+        raise NotImplementedError('As subclasses de "Mob" devem implementar este método.')
 
     @abstractmethod
     def initialize_components(self):
         """Inicializa os componentes utilizados pelo Mob."""
-        pass
+        raise NotImplementedError('As subclasses de "Mob" devem implementar este método.')
 
     def draw_life_bar(self, screen: pygame.Surface, camera: 'Camera') -> None:
         """Desenha a barra de vida do mob de acordo com a posição."""
@@ -50,8 +50,14 @@ class Mob(ABC, pygame.sprite.Sprite):
         """Recebe a quantidade de dano e notifica os listeners."""
         self.life -= damage
         self.receive_damage_sound.play()
-        self._event_manager.notify(
-            {'type': 'damage_event', 'target': self, 'damage': damage, 'animation_frames': self.damage_frames}
+        if hasattr(self, 'damage_frames'):
+            self._event_manager.notify(
+                {
+                'type': 'damage_event', 
+                'target': self, 
+                'damage': damage, 
+                'animation_frames': self.damage_frames
+                }
         )
 
     def defeat(self) -> None:

@@ -19,7 +19,7 @@ class Soul(Mob, pygame.sprite.Sprite):
     Utiliza métodos da classe Mob para gerenciar comportamentos genéricos de entidades.
     """
 
-    MAX_LIFE = 50
+    MAX_LIFE = 10 # 50
     STRENGTH = 15
     MOVE_SPEED = 150
     INITIAL_POSITION = (1150, 465)
@@ -30,9 +30,10 @@ class Soul(Mob, pygame.sprite.Sprite):
     FLOAT_SPEED = 6
 
     def __init__(
-            self, name: str, 
-            images: Dict[str, Any], 
-            sounds: Dict[str, Any], 
+            self: 'Soul', 
+            name: str, 
+            images: Dict[str, pygame.Surface], 
+            sounds: Dict[str, pygame.mixer.Sound], 
             event_manager: 'EventManager'
         ) -> None:
         """ Inicializa os atributos específicos para Soul. """
@@ -41,9 +42,9 @@ class Soul(Mob, pygame.sprite.Sprite):
         self._images = images
         self._sounds = sounds
         self._event_manager = event_manager
-        self._initial_position = self.INITIAL_POSITION
         self._life = self.MAX_LIFE
         self._strength = self.STRENGTH
+        self.initial_position = self.INITIAL_POSITION
         self.speed = self.MOVE_SPEED
         self.xp_points = self.XP_POINTS
         self.type = 'Soul'
@@ -59,6 +60,7 @@ class Soul(Mob, pygame.sprite.Sprite):
         """
         self.default_image = self._images["default"]
         self.attack_image = self._images["attacking"]
+        self.damage_image = self._images["attacking"]
         self.image = self.default_image
         self.rect = self.image.get_rect(center = self.INITIAL_POSITION) 
         self._float_amplitude = self.FLOAT_AMPLITUDE

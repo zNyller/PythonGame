@@ -72,7 +72,7 @@ class SpriteManager:
         (208, 469, 177, 120) # 474, 115
     ]
     TROLL_DAMAGE_COORDS = [
-        (34, 32, 175, 107),
+        (34, 33, 175, 107),
         (270, 4, 194, 136),
         (12, 245, 193, 133),
         (268, 239, 198, 142),
@@ -123,6 +123,12 @@ class SpriteManager:
         self.attack_sprite_coords = self.ATTACK_SPRITE_COORDS
         self.cannon_attack_coords = self.CANNON_ATTACK_COORDS
         self.troll_sprite_coords = self.TROLL_SPRITE_COORDS
+        self.troll_sprite_coords = {
+            'idle': self.TROLL_SPRITE_COORDS,
+            'damage': self.TROLL_DAMAGE_COORDS,
+            'death': self.TROLL_DEATH_COORDS,
+            'attack': self.TROLL_ATTACK_COORDS
+        }
         self._subscribe_to_events()
 
     def _subscribe_to_events(self) -> None:

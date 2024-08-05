@@ -1,6 +1,6 @@
 # Dimensões da janela
-SCREEN_WIDTH = 1024
-SCREEN_HEIGHT = 768
+SCREEN_WIDTH = 1024 # 1024x768 / 1280 x 720
+SCREEN_HEIGHT = 720
 
 # Limite de movimentos
 LEFT_BOUNDARY = -200
