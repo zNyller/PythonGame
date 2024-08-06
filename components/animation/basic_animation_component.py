@@ -20,7 +20,7 @@ class BasicAnimationComponent(AnimationComponent):
         ) -> None:
         """Inicializa os atributos de animação."""
         super().__init__()
-        self._entity = entity
+        self._initial_entity = self._entity = entity
         self._initial_animation_frames = self._animation_frames = animation_frames
         self._event_manager = event_manager
         self._initial_rect = entity.rect
@@ -31,7 +31,9 @@ class BasicAnimationComponent(AnimationComponent):
 
     def notify(self, event) -> None:
         if event['type'] == 'damage_event':
+            self._entity = event['target']
             self._animation_frames = event['animation_frames']
+            self.frame_counter = 0
 
     def update(self, delta_time: float) -> None:
         """Incrementa o contador de animação e atualiza o frame."""
@@ -44,6 +46,7 @@ class BasicAnimationComponent(AnimationComponent):
         self.frame_counter += self._animation_speed * delta_time
         if self.frame_counter >= len(self._animation_frames):
             self.frame_counter = 0
+            self._entity = self._initial_entity
             if self._animation_frames != self._initial_animation_frames:
                 self._animation_frames = self._initial_animation_frames
 
